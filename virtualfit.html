@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VirtualFit: Spatial Try-On</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ease: cubic-bezier(.2,.8,.2,1);
+      --sans: "Inter", system-ui, -apple-system, sans-serif;
+      --MH: min(78vh, 62vw);
+      --CW: 170px;
+      --room: url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261104_080623_c94c85a3-23d5-4a0c-afff-41be1b5b8191.png&w=2400&q=85');
+      --model: url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261104_080717_e02cb856-b812-4c9b-9b86-8a741c7f65eb.png&w=2688&q=85');
+      --garm: url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261104_080719_f5a4cca2-cf42-4957-ab3b-ddec34d2b71a.png&w=2048&q=85');
+    }
+
+    @media (max-width: 767px) {
+      :root {
+        --MH: min(62vh, 128vw);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background: #e9e4dc;
+      color: #fff;
+      font-family: var(--sans);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    @media (pointer: fine) {
+      html, body, button, a {
+        cursor: none !important;
+      }
+    }
+
+    /* 3. Glass Material */
+    .glass {
+      background: linear-gradient(155deg, rgba(250,248,245,.30), rgba(150,144,136,.20) 48%, rgba(205,200,192,.24));
+      backdrop-filter: blur(22px) saturate(1.5);
+      -webkit-backdrop-filter: blur(22px) saturate(1.5);
+      border: 1px solid rgba(255,255,255,.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 0 rgba(255,255,255,.12), 0 20px 50px -24px rgba(40,30,20,.45);
+    }
+
+    /* 1. Room background */
+    .room {
+      position: fixed;
+      inset: -3%;
+      z-index: 1;
+      pointer-events: none;
+      background: var(--room) center / cover no-repeat;
+      filter: blur(2.5px) saturate(1.05);
+      transform: scale(1.08);
+      will-change: transform;
+    }
+
+    .room::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(70% 60% at 50% 45%, rgba(255,252,246,.10), rgba(40,30,20,.16));
+    }
+
+    /* 2. Ghost FIT word */
+    .ghost {
+      position: fixed;
+      left: 50%;
+      top: calc(50% - var(--MH) * .42);
+      transform: translate(-50%, 0);
+      z-index: 2;
+      pointer-events: none;
+      white-space: nowrap;
+      font-family: var(--sans);
+      font-weight: 900;
+      font-size: calc(var(--MH) * .42);
+      line-height: .8;
+      letter-spacing: -.04em;
+      color: rgba(255,255,255,.3);
+      -webkit-text-stroke: 1px rgba(255,255,255,.35);
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+      will-change: transform;
+    }
+
+    .ghost span {
+      display: inline-block;
+      will-change: transform;
+    }
+
+    /* Back to ChicSort Pill */
+    .back-btn {
+      position: fixed;
+      left: max(18px, 1.8vw);
+      top: 4.2vh;
+      z-index: 40;
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 13px;
+      color: #111;
+      text-decoration: none;
+      transition: transform .2s var(--ease), background .2s;
+    }
+    .back-btn:hover {
+      transform: scale(1.04);
+    }
+    .back-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* 4. Tabs */
+    .tabs {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 4.2vh;
+      z-index: 30;
+      padding: 5px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tab-pill {
+      position: absolute;
+      left: 0;
+      top: 5px;
+      height: calc(100% - 10px);
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 4px 14px -6px rgba(0,0,0,.3);
+      pointer-events: none;
+      transition: transform .6s var(--ease), width .6s var(--ease);
+      z-index: 1;
+    }
+
+    .tab-btn {
+      height: 38px;
+      padding: 0 22px;
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 14px;
+      color: rgba(30,30,32,.72);
+      position: relative;
+      z-index: 2;
+      border-radius: 999px;
+      transition: color .3s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: #111;
+      font-weight: 600;
+    }
+
+    /* 5. Rail */
+    .rail {
+      position: fixed;
+      left: max(18px, 1.8vw);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      padding: 8px;
+      border-radius: 999px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .rail-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: rgba(30,30,32,.8);
+      transition: background .25s, color .25s;
+    }
+
+    .rail-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    .rail-btn:hover {
+      background: rgba(255,255,255,.35);
+    }
+
+    .rail-btn.active {
+      background: rgba(255,255,255,.9);
+      color: #111;
+    }
+
+    /* 6. Stage & Arc */
+    .stage {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      touch-action: pan-y;
+      overflow: hidden;
+    }
+
+    .arc {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+    }
+
+    .card {
+      position: absolute;
+      width: var(--CW);
+      height: calc(var(--CW) * 1.42);
+      left: calc(var(--CW) * -0.5);
+      top: calc(var(--CW) * -0.71);
+      border-radius: 22px;
+      overflow: hidden;
+      will-change: transform, opacity, filter;
+      transform-origin: 50% 50%;
+      cursor: pointer;
+    }
+
+    .card .g {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 5%;
+      height: 66%;
+      filter: drop-shadow(0 14px 14px rgba(40,30,20,.22));
+      background-image: var(--garm);
+      background-size: 320% 212.5%;
+      pointer-events: none;
+    }
+
+    .card .name {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 17%;
+      font-weight: 500;
+      font-size: calc(var(--CW) * .068);
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 8px rgba(0,0,0,.18);
+      pointer-events: none;
+    }
+
+    .card .price {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 7%;
+      font-weight: 700;
+      font-size: calc(var(--CW) * .095);
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 8px rgba(0,0,0,.18);
+      pointer-events: none;
+    }
+
+    .card .sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.5) 50%, transparent 60%);
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+
+    /* 7. Model */
+    .model {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      height: var(--MH);
+      aspect-ratio: 524 / 1360;
+      z-index: 50;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    #mCur, #mNext {
+      position: absolute;
+      inset: 0;
+      background-image: var(--model);
+      background-size: 513% 111.76%;
+      background-position-y: 100%;
+      will-change: clip-path, transform;
+    }
+
+    #mCur {
+      opacity: 0;
+    }
+
+    #mNext {
+      clip-path: inset(0 0 100% 0);
+    }
+
+    .model .grid {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.22) 5px 6px);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      clip-path: inset(0 0 100% 0);
+      will-change: clip-path;
+    }
+
+    .model .scan {
+      position: absolute;
+      left: -14%;
+      width: 128%;
+      height: 2px;
+      top: 0;
+      background: linear-gradient(to right, transparent, #fff 18%, #fff 82%, transparent);
+      box-shadow: 0 0 18px 4px rgba(255,255,255,.75), 0 0 60px 10px rgba(190,225,255,.45);
+      opacity: 0;
+      pointer-events: none;
+      will-change: top, transform, opacity;
+    }
+
+    .model .scan::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 2px;
+      height: calc(var(--MH) * .12);
+      background: linear-gradient(to top, rgba(220,238,255,.32), transparent);
+      pointer-events: none;
+    }
+
+    /* 8. Arrows */
+    .arrow-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      transition: transform .2s var(--ease), background .25s;
+    }
+
+    .arrow-btn:hover {
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .arrow-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #222;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .arrow-prev {
+      left: calc(max(18px, 1.8vw) + 76px);
+    }
+
+    .arrow-next {
+      right: max(18px, 1.8vw);
+    }
+
+    /* 9. Buy Card */
+    .buy {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 4.6vh;
+      z-index: 60;
+      width: min(640px, calc(100vw - 32px));
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 12px 22px 12px 12px;
+      border-radius: 24px;
+      color: #fff;
+      text-shadow: 0 1px 6px rgba(0,0,0,.18);
+    }
+
+    .buy-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.3);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .thumb-g {
+      position: absolute;
+      inset: 6px;
+      background-image: var(--garm);
+      background-size: 320% 212.5%;
+      filter: drop-shadow(0 6px 6px rgba(40,30,20,.2));
+      will-change: transform;
+    }
+
+    .buy-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .ln {
+      position: relative;
+      height: 1.15em;
+      overflow: hidden;
+      display: block;
+    }
+
+    .ln > div {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .buy-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .buy-price {
+      font-weight: 500;
+      font-size: 14px;
+      color: rgba(255,255,255,.9);
+    }
+
+    .buy-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .group-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,.85);
+      line-height: 1.15;
+    }
+
+    .size-chips {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.22);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .15s, background .25s, color .25s;
+    }
+
+    .chip:active {
+      transform: scale(0.9);
+    }
+
+    .chip.active {
+      background: #fff;
+      color: #111;
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .dot.active {
+      box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 0 0 4px rgba(0,0,0,.12);
+    }
+
+    /* 10. Cursor */
+    .cur {
+      width: 58px;
+      height: 58px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+    }
+
+    .cur-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.95);
+      background: rgba(255,255,255,.14);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 6px 20px -8px rgba(0,0,0,.35);
+      transition: transform .5s var(--ease), background .5s var(--ease), border-color .5s var(--ease);
+    }
+
+    .cur-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      position: relative;
+      z-index: 2;
+      transition: opacity .4s var(--ease), transform .4s var(--ease);
+    }
+
+    .cur-text {
+      position: absolute;
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-align: center;
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(.7);
+      transition: opacity .45s var(--ease), transform .45s var(--ease);
+      z-index: 3;
+    }
+
+    .cur-text.try {
+      color: #111;
+    }
+
+    .cur-text.drag {
+      color: #fff;
+    }
+
+    /* Cursor states */
+    .cur.is-try .cur-ring {
+      transform: scale(1.5);
+      background: rgba(255,255,255,.92);
+    }
+    .cur.is-try .cur-dot {
+      opacity: 0;
+      transform: scale(0);
+    }
+    .cur.is-try .cur-text.try {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .cur.is-drag .cur-ring {
+      transform: scale(1.2);
+    }
+    .cur.is-drag .cur-dot {
+      opacity: 0;
+      transform: scale(0);
+    }
+    .cur.is-drag .cur-text.drag {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .cur.is-btn .cur-ring {
+      transform: scale(0.6);
+    }
+    .cur.is-btn .cur-dot {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    .cur.is-down .cur-ring {
+      transform: scale(1.05);
+    }
+    .cur.is-try.is-down .cur-ring {
+      transform: scale(1.4);
+    }
+    .cur.is-drag.is-down .cur-ring {
+      transform: scale(1.15);
+    }
+
+    /* 9. Phones (<=767px) */
+    @media (max-width: 767px) {
+      .tabs {
+        top: 2vh;
+        max-width: calc(100vw - 24px);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-btn {
+        height: 32px;
+        padding: 0 13px;
+        font-size: 12px;
+      }
+      .rail {
+        left: 10px;
+        top: auto;
+        bottom: calc(4.6vh + 150px);
+        transform: none;
+      }
+      .rail-btn {
+        width: 34px;
+        height: 34px;
+      }
+      .rail-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+      .arrow-btn {
+        display: none;
+      }
+      .buy {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 16px;
+        bottom: 2vh;
+      }
+      .buy-info {
+        flex: 1 1 50%;
+      }
+      .back-btn {
+        top: 2vh;
+        padding: 0 12px;
+        font-size: 11px;
+        height: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Room Background -->
+  <div class="room" id="room"></div>
+
+  <!-- Ghost FIT Word -->
+  <div class="ghost" id="ghost">
+    <span>F</span><span>I</span><span>T</span>
+  </div>
+
+  <!-- Back to ChicSort Link -->
+  <a href="index.html" class="glass back-btn" id="btn-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+    <span>ChicSort Hub</span>
+  </a>
+
+  <!-- Top Category Tabs -->
+  <nav class="tabs glass" id="tabs">
+    <div class="tab-pill" id="tabPill"></div>
+    <button class="tab-btn active" data-tab="0">Tops</button>
+    <button class="tab-btn" data-tab="1">Bottoms</button>
+    <button class="tab-btn" data-tab="2">Outerwear</button>
+    <button class="tab-btn" data-tab="3">Shoes</button>
+    <button class="tab-btn" data-tab="4">Accessories</button>
+  </nav>
+
+  <!-- Left Tool Rail -->
+  <div class="rail glass" id="rail">
+    <button class="rail-btn active" title="Virtual Wardrobe">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L9 5H4v4l2.5 1.5L4 12v9h16v-9l-2.5-1.5L20 9V5h-5l-3-3z"/>
+      </svg>
+    </button>
+    <button class="rail-btn" title="Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+    </button>
+    <button class="rail-btn" title="Calendar Log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </button>
+    <button class="rail-btn" title="User Profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Central Model with Scanline & Reveal Layers -->
+  <div class="model" id="model">
+    <div id="mCur"></div>
+    <div id="mNext"></div>
+    <div class="grid" id="mGrid"></div>
+    <div class="scan" id="mScan"></div>
+  </div>
+
+  <!-- Navigation Arrows -->
+  <button class="arrow-btn arrow-prev glass" id="btnPrev" aria-label="Previous Outfit">
+    <svg viewBox="0 0 24 24">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
+  <button class="arrow-btn arrow-next glass" id="btnNext" aria-label="Next Outfit">
+    <svg viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
+
+  <!-- 3D Arc Stage -->
+  <div class="stage" id="stage">
+    <div class="arc" id="arc"></div>
+  </div>
+
+  <!-- Buy Floating Glass Card -->
+  <div class="buy glass" id="buyCard">
+    <div class="buy-thumb">
+      <div class="thumb-g" id="thumbG"></div>
+    </div>
+    <div class="buy-info">
+      <div class="ln buy-name" id="nameContainer"></div>
+      <div class="ln buy-price" id="priceContainer"></div>
+    </div>
+    <div class="buy-group">
+      <span class="group-label">Size</span>
+      <div class="size-chips" id="sizeChips">
+        <button class="chip" data-size="S">S</button>
+        <button class="chip active" data-size="M">M</button>
+        <button class="chip" data-size="L">L</button>
+        <button class="chip" data-size="XL">XL</button>
+      </div>
+    </div>
+    <div class="buy-group">
+      <div class="ln group-label" id="colorLabelContainer"></div>
+      <div class="color-dots" id="colorDots"></div>
+    </div>
+  </div>
+
+  <!-- Spatial Custom Cursor -->
+  <div class="cur" id="cursor">
+    <div class="cur-ring"></div>
+    <div class="cur-dot"></div>
+    <span class="cur-text try">TRY ON</span>
+    <span class="cur-text drag">DRAG</span>
+  </div>
+
+  <script>
+    // 3. Exact Data Array
+    const ITEMS = [
+      {n:"Basic T-shirt", p:45,  g:[1.14,3.06],  m:.37,   c:[["White","#f4f2ee"],["Ash","#c9c7c2"],["Charcoal","#3b3c3f"],["Navy","#27324d"]]},
+      {n:"Basic Sweater", p:105, g:[49.7,1.39],  m:25.0,  c:[["White","#f6f4ef"],["Oat","#ddd3c2"],["Sage","#b9c2ae"],["Black","#1f1f21"]]},
+      {n:"Linen Shirt",   p:95,  g:[98.2,3.33],  m:49.86, c:[["White","#f7f6f1"],["Sand","#d9ccb4"],["Sky","#bcd0e2"],["Olive","#717556"]]},
+      {n:"Grey Hoodie",   p:110, g:[1.14,93.3],  m:74.77, c:[["Heather","#a9a9a8"],["Bone","#e6e1d6"],["Forest","#33463a"],["Black","#1f1f21"]]},
+      {n:"Ringer Tee",    p:55,  g:[49.7,95.3],  m:99.35, c:[["White / Black","#f4f2ee"],["Cream / Navy","#efe6d3"],["Grey / Red","#c9c7c2"],["White / Green","#e9efe8"]]}
+    ];
+
+    // Reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // State Variables
+    let pos = 0;
+    let target = 0;
+    let intro = prefersReducedMotion ? 1 : 0;
+    let activeOutfitIdx = -1;
+    let currentColorIdx = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartPos = 0;
+    let lastDragX = 0;
+    let lastDragTime = 0;
+    let dragVelocity = 0;
+
+    // Smoothed pointer for parallax & tilt
+    let rawPointerX = 0.5;
+    let rawPointerY = 0.5;
+    let sx = 0;
+    let sy = 0;
+
+    // Cursor tracking
+    let curX = window.innerWidth / 2;
+    let curY = window.innerHeight / 2;
+    let curTargetX = curX;
+    let curTargetY = curY;
+    let curMode = ''; // 'try', 'drag', 'btn'
+
+    // DOM Elements
+    const roomEl = document.getElementById('room');
+    const ghostEl = document.getElementById('ghost');
+    const ghostSpans = ghostEl.querySelectorAll('span');
+    const arcEl = document.getElementById('arc');
+    const mCur = document.getElementById('mCur');
+    const mNext = document.getElementById('mNext');
+    const mGrid = document.getElementById('mGrid');
+    const mScan = document.getElementById('mScan');
+    const thumbG = document.getElementById('thumbG');
+    const nameContainer = document.getElementById('nameContainer');
+    const priceContainer = document.getElementById('priceContainer');
+    const colorLabelContainer = document.getElementById('colorLabelContainer');
+    const colorDotsContainer = document.getElementById('colorDots');
+    const cursorEl = document.getElementById('cursor');
+    const tabPill = document.getElementById('tabPill');
+    const stageEl = document.getElementById('stage');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+
+    // 10 Cards in Arc (5 items duplicated for seamless looping)
+    const cards = [];
+    const seeds = Array.from({ length: 10 }, () => Math.random() * Math.PI * 2);
+
+    for (let i = 0; i < 10; i++) {
+      const item = ITEMS[i % 5];
+      const card = document.createElement('div');
+      card.className = 'card glass';
+      card.innerHTML = `
+        <div class="g" style="background-position:${item.g[0]}% ${item.g[1]}%"></div>
+        <div class="name">${item.n}</div>
+        <div class="price">$${item.p}</div>
+        <div class="sheen"></div>
+      `;
+      arcEl.appendChild(card);
+      cards.push(card);
+
+      // Card hover sheen trigger
+      if (!prefersReducedMotion) {
+        card.addEventListener('mouseenter', () => {
+          const sheen = card.querySelector('.sheen');
+          if (sheen) {
+            sheen.animate([
+              { transform: 'translateX(-100%)' },
+              { transform: 'translateX(100%)' }
+            ], { duration: 1000, easing: 'cubic-bezier(.2,.8,.2,1)' });
+          }
+        });
+      }
+
+      // Card click
+      card.addEventListener('click', (e) => {
+        if (Math.abs(lastDragX - dragStartX) < 6) {
+          // Bring clicked card to center
+          target = Math.round(pos + (((i - pos + 5) % 10 + 10) % 10 - 5));
+        }
+      });
+    }
+
+    // Set Card Width Responsive
+    function updateCardWidth() {
+      const isPhone = window.innerWidth <= 767;
+      const cw = isPhone 
+        ? Math.min(window.innerWidth * 0.30, 170)
+        : Math.min(window.innerWidth * 0.148, window.innerHeight * 0.33);
+      document.documentElement.style.setProperty('--CW', `${cw}px`);
+    }
+    updateCardWidth();
+    window.addEventListener('resize', updateCardWidth);
+
+    // Initial Tab Pill Position
+    function positionTabPill(tabBtn) {
+      if (!tabBtn) return;
+      tabPill.style.width = `${tabBtn.offsetWidth}px`;
+      tabPill.style.transform = `translateX(${tabBtn.offsetLeft}px)`;
+    }
+    const initialActiveTab = document.querySelector('.tab-btn.active');
+    setTimeout(() => positionTabPill(initialActiveTab), 50);
+
+    // Tab clicks: slide pill & add 5 to target
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        positionTabPill(btn);
+        target += 5; // do a full lap and land back on same garment
+      });
+    });
+
+    // Arrow Buttons
+    btnPrev.addEventListener('click', () => { target -= 1; });
+    btnNext.addEventListener('click', () => { target += 1; });
+
+    // Keyboard Arrow Keys
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') target -= 1;
+      if (e.key === 'ArrowRight') target += 1;
+    });
+
+    // Mouse Wheel
+    let wheelDeltaAccumulator = 0;
+    let lastWheelStepTime = 0;
+    window.addEventListener('wheel', (e) => {
+      const now = performance.now();
+      wheelDeltaAccumulator += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
+      if (Math.abs(wheelDeltaAccumulator) >= 60 && now - lastWheelStepTime >= 260) {
+        target += Math.sign(wheelDeltaAccumulator);
+        wheelDeltaAccumulator = 0;
+        lastWheelStepTime = now;
+      }
+    }, { passive: true });
+
+    // Stage Pointer Drag Handling
+    stageEl.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.card')) {
+        // card may be clicked or dragged
+      }
+      isDragging = true;
+      dragStartX = e.clientX;
+      lastDragX = e.clientX;
+      lastDragTime = performance.now();
+      dragStartPos = pos;
+      dragVelocity = 0;
+      stageEl.setPointerCapture(e.pointerId);
+    });
+
+    stageEl.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const now = performance.now();
+      const dt = now - lastDragTime;
+      const dx = e.clientX - lastDragX;
+      if (dt > 0) {
+        dragVelocity = dx / dt;
+      }
+      lastDragX = e.clientX;
+      lastDragTime = now;
+
+      const isPhone = window.innerWidth <= 767;
+      const W = window.innerWidth;
+      const xs1 = isPhone ? 0.36 * W : 0.215 * W;
+      const totalDx = e.clientX - dragStartX;
+      pos = dragStartPos - (totalDx / xs1);
+    });
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      target = Math.round(pos - dragVelocity * 3.2);
+    }
+    stageEl.addEventListener('pointerup', endDrag);
+    stageEl.addEventListener('pointercancel', endDrag);
+
+    // Global Pointer Coordinates for Cursor & Parallax
+    window.addEventListener('pointermove', (e) => {
+      curTargetX = e.clientX;
+      curTargetY = e.clientY;
+      rawPointerX = e.clientX / window.innerWidth;
+      rawPointerY = e.clientY / window.innerHeight;
+
+      // Determine Cursor Mode
+      const targetEl = e.target;
+      if (targetEl.closest('button, a, .chip, .dot, .tab-btn, .rail-btn')) {
+        curMode = 'btn';
+      } else if (targetEl.closest('.card')) {
+        curMode = 'try';
+      } else if (isDragging || targetEl.closest('.stage')) {
+        curMode = 'drag';
+      } else {
+        curMode = '';
+      }
+    });
+
+    window.addEventListener('pointerdown', () => cursorEl.classList.add('is-down'));
+    window.addEventListener('pointerup', () => cursorEl.classList.remove('is-down'));
+
+    // Buy Card Rolling Text Update
+    function rollText(container, newText) {
+      const oldEl = container.firstElementChild;
+      if (oldEl && oldEl.textContent === newText) return;
+
+      const newEl = document.createElement('div');
+      newEl.textContent = newText;
+      newEl.style.position = 'absolute';
+      newEl.style.left = '0';
+      newEl.style.top = '0';
+      newEl.style.width = '100%';
+      newEl.style.transform = 'translateY(110%)';
+      container.appendChild(newEl);
+
+      if (prefersReducedMotion) {
+        if (oldEl) oldEl.remove();
+        newEl.style.position = 'relative';
+        newEl.style.transform = 'none';
+        return;
+      }
+
+      if (oldEl) {
+        oldEl.animate(
+          [{ transform: 'translateY(0)' }, { transform: 'translateY(-110%)' }],
+          { duration: 620, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }
+        ).onfinish = () => oldEl.remove();
+      }
+
+      newEl.animate(
+        [{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }],
+        { duration: 620, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }
+      );
+    }
+
+    // Size Chips Click Handling
+    document.getElementById('sizeChips').querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+
+    // Active animations tracking
+    let activeScanAnimations = [];
+
+    // 6. Try-On Scan Function (950 ms)
+    function runTryOn(itemIndex) {
+      activeOutfitIdx = itemIndex;
+      const item = ITEMS[itemIndex];
+
+      // 1. Update Buy Card
+      rollText(nameContainer, item.n);
+      rollText(priceContainer, `$${item.p}`);
+
+      // Thumbnail jump & animate
+      thumbG.style.backgroundPosition = `${item.g[0]}% ${item.g[1]}%`;
+      if (!prefersReducedMotion) {
+        thumbG.animate(
+          [{ transform: 'translateY(70%) scale(.8)' }, { transform: 'translateY(0) scale(1)' }],
+          { duration: 650, easing: 'cubic-bezier(.2,.8,.2,1)' }
+        );
+      }
+
+      // Rebuild Color Dots
+      colorDotsContainer.innerHTML = '';
+      currentColorIdx = 0;
+      rollText(colorLabelContainer, `Color · ${item.c[0][0]}`);
+
+      item.c.forEach(([colorName, colorHex], cIdx) => {
+        const dot = document.createElement('div');
+        dot.className = `dot ${cIdx === 0 ? 'active' : ''}`;
+        dot.style.background = colorHex;
+        dot.addEventListener('click', () => {
+          colorDotsContainer.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+          dot.classList.add('active');
+          rollText(colorLabelContainer, `Color · ${colorName}`);
+        });
+        colorDotsContainer.appendChild(dot);
+      });
+
+      // Reduced motion bypass
+      if (prefersReducedMotion) {
+        mCur.style.backgroundPositionX = `${item.m}%`;
+        mCur.style.opacity = '1';
+        return;
+      }
+
+      // 2. Cancel running animations
+      activeScanAnimations.forEach(anim => {
+        try { anim.cancel(); } catch (err) {}
+      });
+      activeScanAnimations = [];
+
+      // 3. Set #mNext crop
+      mNext.style.backgroundPositionX = `${item.m}%`;
+
+      // Animation 1: #mNext clip (950ms)
+      const animNext = mNext.animate(
+        [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }],
+        { duration: 950, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }
+      );
+
+      // Animation 2: .grid clip (1092ms)
+      const animGrid = mGrid.animate(
+        [
+          { clipPath: 'inset(0 0 100% 0)' },
+          { clipPath: 'inset(0 0 0 0)', offset: 0.5 },
+          { clipPath: 'inset(100% 0 0 0)' }
+        ],
+        { duration: 1092, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }
+      );
+
+      // Animation 3: .scan line (950ms)
+      const animScan = mScan.animate(
+        [
+          { top: '0%', transform: 'scaleX(0.2)', opacity: 0 },
+          { top: '6%', transform: 'scaleX(1)', opacity: 1, offset: 0.08 },
+          { top: '94%', transform: 'scaleX(1)', opacity: 1, offset: 0.92 },
+          { top: '100%', transform: 'scaleX(0.2)', opacity: 0 }
+        ],
+        { duration: 950, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'forwards' }
+      );
+
+      // Animation 4: #mNext settle (1250ms)
+      const animSettle = mNext.animate(
+        [{ transform: 'scale(1.012)' }, { transform: 'scale(1)' }],
+        { duration: 1250, easing: 'ease-out', fill: 'forwards' }
+      );
+
+      activeScanAnimations = [animNext, animGrid, animScan, animSettle];
+
+      animNext.onfinish = () => {
+        mCur.style.backgroundPositionX = `${item.m}%`;
+        mCur.style.opacity = '1';
+        mNext.style.clipPath = 'inset(0 0 100% 0)';
+        activeScanAnimations.forEach(a => {
+          try { a.cancel(); } catch (err) {}
+        });
+        activeScanAnimations = [];
+      };
+    }
+
+    // 5. Arc Maths & Animation Loop (Every Frame)
+    function loop(time) {
+      const t = time * 0.001;
+
+      // Spring physics toward target
+      if (!isDragging) {
+        if (prefersReducedMotion) {
+          pos = target;
+        } else {
+          pos += (target - pos) * 0.11;
+        }
+      }
+
+      // Smooth pointer offsets in [-.5, .5]
+      const targetSx = rawPointerX - 0.5;
+      const targetSy = rawPointerY - 0.5;
+      sx += (targetSx - sx) * 0.06;
+      sy += (targetSy - sy) * 0.06;
+
+      // Cursor follower
+      curX += (curTargetX - curX) * 0.22;
+      curY += (curTargetY - curY) * 0.22;
+      cursorEl.style.transform = `translate3d(${curX - 29}px, ${curY - 29}px, 0)`;
+
+      // Cursor mode classes
+      cursorEl.className = 'cur' + (curMode ? ` is-${curMode}` : '');
+
+      // Intro progression
+      if (!prefersReducedMotion && intro < 1) {
+        intro += 0.012;
+        if (intro > 1) intro = 1;
+      }
+      const ie = prefersReducedMotion ? 1 : (1 - Math.pow(1 - intro, 3));
+
+      // Parallax
+      roomEl.style.transform = `translate3d(${-sx * 22}px, ${-sy * 14}px, 0) scale(${1.08 - 0.03 * ie})`;
+      ghostEl.style.transform = `translate(calc(-50% - ${sx * 40}px), ${-sy * 16}px)`;
+      ghostSpans.forEach((span, k) => {
+        span.style.transform = `translateY(${(1 - ie) * (60 + 30 * k)}px)`;
+      });
+
+      // Responsive Table XS
+      const isPhone = window.innerWidth <= 767;
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      const XS = isPhone
+        ? [0, .36, .5, .56, .6, .62].map(v => v * W)
+        : [0, .215, .345, .432, .49, .52].map(v => v * W);
+
+      function xAt(a) {
+        if (a <= 0) return XS[0];
+        const idx = Math.min(Math.floor(a), XS.length - 2);
+        const frac = a - idx;
+        return XS[idx] + (XS[idx + 1] - XS[idx]) * frac;
+      }
+
+      // Render 10 Cards
+      for (let i = 0; i < 10; i++) {
+        const card = cards[i];
+        const u = ((i - pos + 5) % 10 + 10) % 10 - 5;
+        const a = Math.abs(u);
+        const sg = Math.sign(u) || 1;
+
+        const x = sg * xAt(a) * ie;
+
+        let s, z, opacity, ry, blur;
+        if (a < 1) {
+          s = 0.55 + 0.45 * a;
+          z = -260 * (1 - a);
+          opacity = a;
+          ry = -sg * 16 * a;
+          blur = 0;
+        } else {
+          s = 1 / (1 + 0.3 * Math.pow(a - 1, 1.15));
+          z = -110 * (a - 1);
+          ry = -sg * (16 + 9 * Math.min(2, a - 1));
+          blur = Math.max(0, a - 1.6) * 2.4;
+          opacity = 1;
+        }
+
+        if (a > 3.4) {
+          opacity = Math.max(0, 1 - (a - 3.4) / 0.8);
+        }
+
+        const bob = prefersReducedMotion ? 0 : (Math.sin(t * 1.1 + seeds[i]) * H * 0.006 * Math.min(1, a));
+        const y = bob - (1 - s) * H * 0.04;
+
+        ry += sx * 10;
+
+        card.style.transform = `translate(${x}px, ${y}px) perspective(1300px) translateZ(${z}px) rotateY(${ry}deg) rotateX(${-sy * 6}deg) scale(${s * (0.6 + 0.4 * ie)})`;
+        card.style.filter = (blur > 0.05 && !prefersReducedMotion) ? `blur(${blur}px)` : 'none';
+        card.style.zIndex = a < 1 ? 1 : Math.round(100 - 10 * a);
+        card.style.opacity = (opacity * ie).toFixed(3);
+        card.style.display = (opacity * ie < 0.01) ? 'none' : 'block';
+      }
+
+      // Settle check
+      if (!isDragging && Math.abs(target - pos) < 0.02) {
+        const itemIdx = ((Math.round(target) % 5) + 5) % 5;
+        if (itemIdx !== activeOutfitIdx) {
+          runTryOn(itemIdx);
+        }
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    // Launch RAF Loop
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChicSort | Wardrobe-First Styling Intelligence</title>
+  <meta name="description" content="AI-Powered Digital Wardrobe and Personal Styling Assistant for Urban Youth." />
+
+  <!-- Google Fonts with 100% Native Vietnamese Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              electric: '#0474C4',
+              steel: '#5379AE',
+              petrol: '#2C444C',
+              ice: '#A8C4EC',
+              navy: '#06457F',
+              indigo: '#262B40'
+            },
+            cobalt: { 
+              DEFAULT: '#0474C4', 
+              dark: '#06457F', 
+              steel: '#5379AE', 
+              ice: '#A8C4EC',
+              subtle: '#F0F5FC' 
+            },
+            petrol: '#2C444C',
+            ink: '#262B40',
+            paper: '#F6F8FC'
+          },
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', '"Be Vietnam Pro"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            mono: ['"Space Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="selection:bg-blue-600 selection:text-white">
+
+  <!-- =========================================
+       EDITORIAL TOP BAR & NAVIGATION
+       ========================================= -->
+  <header class="editorial-nav" id="main-header">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between gap-4">
+
+        <!-- Wordmark with Architectural Monogram -->
+        <a href="#pitch" data-nav-tab="pitch" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center font-display text-sm font-bold tracking-tight group-hover:bg-cobalt transition-colors">
+            CS
+          </div>
+          <div>
+            <span class="font-display font-black text-base sm:text-lg tracking-tight text-ink uppercase block leading-none">
+              CHIC<span class="text-cobalt">SORT</span>
+            </span>
+            <span class="font-display text-xs text-ink-muted block mt-1" data-i18n="brandWordmarkSub">
+              Tủ đồ số cá nhân
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Tabs: Soft & Elegant -->
+        <nav class="hidden md:flex items-center gap-1" id="desktop-nav">
+          <button data-nav-tab="pitch" class="nav-link tab-active">
+            <span data-i18n="navPitch">Tổng quan</span>
+          </button>
+          <button data-nav-tab="wardrobe" class="nav-link">
+            <span data-i18n="navWardrobe">Tủ đồ của tôi</span>
+          </button>
+          <button data-nav-tab="stylist" class="nav-link">
+            <span data-i18n="navStylist">Trợ lý Phối đồ</span>
+          </button>
+          <button data-nav-tab="calendar" class="nav-link">
+            <span data-i18n="navCalendar">Nhật ký mặc đồ</span>
+          </button>
+          <button data-nav-tab="pricing" class="nav-link">
+            <span data-i18n="navPricing">Gói cước</span>
+          </button>
+        </nav>
+
+        <!-- Right Controls: Theme Toggle & Language Switcher & Quick Launch -->
+        <div class="flex items-center gap-2.5">
+          <!-- Theme Toggle (Light / Dark) -->
+          <button id="btn-theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+            <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Seamless Capsule Language Switcher (No Boxy Overflow) -->
+          <div class="lang-pill-container">
+            <button id="btn-lang-vi" class="lang-btn active">VI</button>
+            <button id="btn-lang-en" class="lang-btn">EN</button>
+          </div>
+
+          <!-- Direct Wardrobe CTA -->
+          <button data-nav-tab="wardrobe" class="btn-editorial-primary hidden sm:inline-flex text-sm py-2.5 px-5 rounded-full">
+            <span data-i18n="btnTryDemo">Trải nghiệm Tủ đồ</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+          <!-- Mobile Nav Toggle -->
+          <button id="btn-mobile-menu" class="md:hidden p-2 text-ink border border-slate-200 bg-white rounded-lg">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu Drawer -->
+  <div id="mobile-nav-drawer" class="fixed inset-0 z-50 pointer-events-none opacity-0 transition-opacity duration-300">
+    <div id="mobile-nav-backdrop" class="absolute inset-0 bg-ink/60"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-72 bg-white p-6 shadow-2xl flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-center pb-4 mb-6 border-b border-slate-100">
+          <span class="font-display font-black text-base uppercase">ChicSort Menu</span>
+          <button id="btn-close-mobile-menu" class="p-1 text-slate-400 hover:text-ink">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="flex flex-col gap-3 text-base">
+          <button data-nav-tab="pitch" class="text-left py-2 border-b border-slate-50 text-cobalt font-bold">
+            <span data-i18n="navPitch">Tổng quan</span>
+          </button>
+          <button data-nav-tab="wardrobe" class="text-left py-2 border-b border-slate-50 text-slate-600">
+            <span data-i18n="navWardrobe">Tủ đồ của tôi</span>
+          </button>
+          <button data-nav-tab="stylist" class="text-left py-2 border-b border-slate-50 text-slate-600">
+            <span data-i18n="navStylist">Trợ lý Phối đồ</span>
+          </button>
+          <button data-nav-tab="calendar" class="text-left py-2 border-b border-slate-50 text-slate-600">
+            <span data-i18n="navCalendar">Nhật ký mặc đồ</span>
+          </button>
+          <button data-nav-tab="pricing" class="text-left py-2 text-slate-600">
+            <span data-i18n="navPricing">Gói cước</span>
+          </button>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-slate-100 text-sm text-slate-400">
+        ChicSort Personal Styling 2026
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       MAIN CONTENT CONTAINER
+       ========================================= -->
+  <main class="w-full">
+
+    <!-- =============================================
+         VIEW 1: OVERVIEW & EDITORIAL MANIFESTO
+         ============================================= -->
+    <section id="view-pitch" class="view-panel">
+
+      <!-- =============================================
+           VIRTUALFIT: SPATIAL 3D TRY-ON HERO SHOWCASE
+           (Interactive Concept Showcase / Minh họa trải nghiệm tương lai)
+           ============================================= -->
+      <div id="vf-hero" class="vf-hero">
+        <!-- Room Background -->
+        <div class="vf-room"></div>
+
+        <!-- Ghost FIT Typography -->
+        <div class="vf-ghost">
+          <span>F</span><span>I</span><span>T</span>
+        </div>
+
+        <!-- visionOS Glass Category Tabs -->
+        <nav class="vf-tabs glass">
+          <div class="vf-tab-pill" id="vf-tabPill"></div>
+          <button class="vf-tab-btn active" data-tab="0" data-i18n="filterTops">Tops</button>
+          <button class="vf-tab-btn" data-tab="1" data-i18n="filterBottoms">Bottoms</button>
+          <button class="vf-tab-btn" data-tab="2" data-i18n="filterOuterwear">Outerwear</button>
+          <button class="vf-tab-btn" data-tab="3" data-i18n="filterShoes">Shoes</button>
+          <button class="vf-tab-btn" data-tab="4" data-i18n="filterAccessories">Accessories</button>
+        </nav>
+
+        <!-- Central Model with Scanline & Reveal Layers -->
+        <div class="vf-model">
+          <div id="vf-mCur"></div>
+          <div id="vf-mNext"></div>
+          <div class="grid" id="vf-mGrid"></div>
+          <div class="scan" id="vf-mScan"></div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="vf-arrow-btn vf-arrow-prev glass" id="vf-btnPrev" aria-label="Previous Outfit">
+          <svg viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="vf-arrow-btn vf-arrow-next glass" id="vf-btnNext" aria-label="Next Outfit">
+          <svg viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- 3D Arc Stage -->
+        <div class="vf-stage">
+          <div class="vf-arc"></div>
+        </div>
+
+        <!-- Gentle Floating Scroll Indicator -->
+        <a href="#chic-platform" class="vf-scroll-indicator glass">
+          <span data-i18n="vfScrollText">Khám phá giải pháp ChicSort</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </a>
+
+        <!-- Spatial Custom Cursor -->
+        <div class="vf-cur" id="vf-cursor">
+          <div class="vf-cur-ring"></div>
+          <div class="vf-cur-dot"></div>
+          <span class="vf-cur-text try">TRY ON</span>
+          <span class="vf-cur-text drag">DRAG</span>
+        </div>
+      </div>
+
+      <!-- === EDITORIAL HERO SPLIT === -->
+      <div class="hero-editorial" id="chic-platform">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+
+            <!-- Left: Hero Typographic Manifesto (Max 2 lines H1, tight copy) -->
+            <div class="lg:col-span-7 space-y-6">
+              
+              <!-- Gentle Fashion Eyebrow (Removed "/ Khảo sát 212 người") -->
+              <div class="flex items-center gap-3">
+                <span class="fashion-badge">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cobalt"></span>
+                  <span data-i18n="heroBadge">Thời trang thông minh · Tủ đồ số cá nhân</span>
+                </span>
+              </div>
+
+              <!-- H1: Odd Ritual Signature Grotesque + Playfair Display Pairing -->
+              <h1 class="heading-massive text-ink" style="font-size: clamp(2.8rem, 5.8vw, 5.2rem); line-height: 0.95;">
+                <span class="block" data-i18n="heroH1Pre">TỦ ĐỒ CỦA BẠN,</span>
+                <span class="font-serif-italic text-cobalt font-normal tracking-normal lowercase block" style="font-size: 1.1em; margin-top: 6px;" data-i18n="heroH1Post">
+                  lựa chọn thông minh hơn.
+                </span>
+              </h1>
+
+              <!-- Subtext: Under 20 words, sharp and functional -->
+              <p class="text-ink-secondary text-lg md:text-xl max-w-xl font-normal leading-relaxed" data-i18n="heroDesc">
+                Chấm dứt cảm giác đứng hình trước tủ đồ đầy ắp mỗi sáng. ChicSort số hóa trang phục sẵn có và gợi ý outfit chuẩn bối cảnh trong dưới 3 phút.
+              </p>
+
+              <!-- Action Strip -->
+              <div class="pt-2 flex flex-wrap items-center gap-4">
+                <button data-nav-tab="wardrobe" class="btn-editorial-primary rounded-full text-base py-3.5 px-7">
+                  <span data-i18n="btnTryDemo">Trải nghiệm Tủ đồ số</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <a href="#vf-hero" class="btn-editorial-secondary rounded-full flex items-center gap-2 text-base py-3.5 px-6">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cobalt animate-pulse"></span>
+                  <span data-i18n="btnVirtualFitHero">Thử đồ 3D VirtualFit</span>
+                </a>
+                <a href="#survey-ledger" class="text-sm text-ink-muted hover:text-cobalt font-medium underline-offset-4 hover:underline py-2">
+                  <span data-i18n="btnExplorePillars">Khám phá 3 trụ cột giải pháp</span>
+                </a>
+              </div>
+
+              <!-- Proof Points Grid (Spacious Stat Cards) -->
+              <div class="pt-8 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 text-sm">
+                <div class="stat-pill-box p-5 sm:p-6 rounded-2xl">
+                  <span class="text-ink font-black block text-xl md:text-2xl" data-i18n="heroMetric1Val">3 PHÚT</span>
+                  <span class="text-ink-muted text-xs sm:text-sm mt-1.5 block" data-i18n="heroMetric1">Thời gian chọn đồ mỗi sáng</span>
+                </div>
+                <div class="stat-pill-box p-5 sm:p-6 rounded-2xl">
+                  <span class="text-ink font-black block text-xl md:text-2xl" data-i18n="heroMetric2Val">+30%</span>
+                  <span class="text-ink-muted text-xs sm:text-sm mt-1.5 block" data-i18n="heroMetric2">Tăng tần suất mặc đồ sẵn có</span>
+                </div>
+                <div class="stat-pill-box p-5 sm:p-6 rounded-2xl col-span-2 sm:col-span-1">
+                  <span class="text-cobalt font-black block text-xl md:text-2xl" data-i18n="heroMetric3Val">BẢO MẬT</span>
+                  <span class="text-ink-muted text-xs sm:text-sm mt-1.5 block" data-i18n="heroMetric3">Dữ liệu cá nhân an toàn 100%</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right: Architectural Fashion Lookbook Frame (Soft Curves) -->
+            <div class="lg:col-span-5">
+              <div class="hero-lookbook-frame border border-slate-200 rounded-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=85" 
+                  alt="ChicSort Lookbook" 
+                  class="hero-lookbook-img"
+                  loading="eager"
+                />
+                <!-- Soft Fashion Tag Overlay -->
+                <div class="hero-tech-stamp rounded-b-2xl">
+                  <div class="flex justify-between items-end">
+                    <div>
+                      <span class="text-xs sm:text-sm text-white/80 block mb-1" data-i18n="heroLookbookTag">
+                        Gợi ý phối đồ hôm nay
+                      </span>
+                      <p class="font-display font-black text-2xl text-white tracking-tight leading-tight" data-i18n="heroLookbookTitle">
+                        Smart Casual Thu Đông
+                      </p>
+                    </div>
+                    <div class="text-right text-sm text-white/90">
+                      <span class="text-[#A8C4EC] block font-bold text-base" data-i18n="heroLookbookScore">Hòa hợp 98%</span>
+                      <span data-i18n="heroLookbookSeason">Thu Đông</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- === FLUID FASHION MARQUEE === -->
+      <div class="editorial-ticker">
+        <div class="ticker-track">
+          <span>Tủ đồ gọn gàng thông minh</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Tự tin diện đồ mỗi sớm mai</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Gợi ý trang phục chuẩn thời tiết</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Tận dụng trọn vẹn quần áo sẵn có</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Mua sắm tinh tế và có gu</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Tủ đồ gọn gàng thông minh</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Tự tin diện đồ mỗi sớm mai</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Gợi ý trang phục chuẩn thời tiết</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Tận dụng trọn vẹn quần áo sẵn có</span>
+          <span class="text-[#A8C4EC] font-bold">·</span>
+          <span>Mua sắm tinh tế và có gu</span>
+        </div>
+      </div>
+
+      <!-- === SURVEY EVIDENCE LEDGER (NOT 4 EQUAL CARDS!) === -->
+      <section class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-20" id="survey-ledger">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          <!-- Section Title Column -->
+          <div class="lg:col-span-5 space-y-4">
+            <span class="fashion-badge">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span data-i18n="marketGapTag">Khoảng trống thời trang đô thị</span>
+            </span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase leading-tight">
+              <span class="block" data-i18n="marketGapPre">KHOẢNG TRỐNG</span>
+              <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal text-3xl sm:text-4xl block mt-1" data-i18n="marketGapPost">thị trường chưa khai phá</span>
+            </h2>
+            <p class="text-ink-secondary text-sm leading-relaxed max-w-md" data-i18n="marketGapDesc">
+              Nghiên cứu lối sống đô thị xác thực rõ nỗi đau thường trực mỗi sáng và tỷ lệ lãng phí tủ quần áo.
+            </p>
+            <div class="pt-2 text-xs text-ink-muted" data-i18n="marketGapCredit">
+              Dữ liệu nghiên cứu ChicSort · 2026
+            </div>
+          </div>
+
+          <!-- Data Ledger Cards (Spaced Distinct Data Cards) -->
+          <div class="lg:col-span-7 space-y-4">
+            
+            <div class="ledger-card">
+              <span class="font-serif italic text-2xl text-cobalt font-medium">01</span>
+              <div>
+                <p class="font-display font-bold text-lg text-ink" data-i18n="stat2Title">Khủng hoảng lựa chọn mỗi sáng</p>
+                <p class="text-sm text-ink-muted mt-1" data-i18n="stat2Sub">Mất 15-30 phút/ngày để chọn đồ, gây căng thẳng đầu ngày</p>
+              </div>
+              <div class="ledger-metric text-cobalt">72%</div>
+            </div>
+
+            <div class="ledger-card">
+              <span class="font-serif italic text-2xl text-cobalt font-medium">02</span>
+              <div>
+                <p class="font-display font-bold text-lg text-ink" data-i18n="stat3Title">Lãng phí dung lượng tủ đồ</p>
+                <p class="text-sm text-ink-muted mt-1" data-i18n="stat3Sub">Bỏ phí từ 20% đến trên 60% quần áo sẵn có vì quên đồ cất sâu</p>
+              </div>
+              <div class="ledger-metric">60%+</div>
+            </div>
+
+            <div class="ledger-card">
+              <span class="font-serif italic text-2xl text-cobalt font-medium">03</span>
+              <div>
+                <p class="font-display font-bold text-lg text-ink" data-i18n="stat4Title">Mua sắm trùng lặp thụ động</p>
+                <p class="text-sm text-ink-muted mt-1" data-i18n="stat4Sub">Thường mua các món tương tự món đã có do không nhớ tủ đồ</p>
+              </div>
+              <div class="ledger-metric">66%</div>
+            </div>
+
+            <div class="ledger-card">
+              <span class="font-serif italic text-2xl text-cobalt font-medium">04</span>
+              <div>
+                <p class="font-display font-bold text-lg text-ink" data-i18n="stat5Title">Khoảng trống ứng dụng số hóa</p>
+                <p class="text-sm text-ink-muted mt-1" data-i18n="stat5Sub">Chưa từng sử dụng thường xuyên ứng dụng quản lý tủ đồ nào do rào cản chụp ảnh thủ công</p>
+              </div>
+              <div class="ledger-metric text-cobalt">94.8%</div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- === EDITORIAL CORE PILLARS (Asymmetric Architecture) === -->
+      <section class="bg-white border-t border-b border-slate-200">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          
+          <div class="mb-12">
+            <span class="fashion-badge">
+              <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+              <span data-i18n="pillarsTag">Giá trị cốt lõi</span>
+            </span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase mt-3">
+              <span data-i18n="pillarsPre">BA TRỤ CỘT</span> 
+              <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="pillarsPost">giải pháp cốt lõi</span>
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Pillar 01: Save Time -->
+            <div class="pillar-card border border-slate-200 rounded-3xl p-8 sm:p-10 bg-white flex flex-col justify-between shadow-sm">
+              <div>
+                <span class="fashion-tag text-cobalt font-bold mb-4 block">
+                  <span class="w-2.5 h-2.5 rounded-full bg-cobalt inline-block"></span>
+                  <span data-i18n="p1Tag">Tiết kiệm thời gian mỗi sáng</span>
+                </span>
+                <h3 class="font-display font-black text-2xl sm:text-3xl text-ink uppercase mb-3 leading-snug" data-i18n="saveTimeTitle">
+                  SAVE TIME: DƯỚI 3 PHÚT MỖI SÁNG
+                </h3>
+                <p class="text-ink-secondary text-base leading-relaxed mb-8" data-i18n="saveTimeDesc">
+                  Rút ngắn thời gian đắn đo mỗi sáng từ 20+ phút xuống dưới 3 phút nhờ AI gợi ý 1-chạm thông minh dựa trên bối cảnh thời tiết và lịch trình thực tế.
+                </p>
+              </div>
+              <!-- Mini Architectural Graphic -->
+              <div class="bg-paper p-6 border border-slate-200 rounded-2xl text-sm space-y-3">
+                <div class="flex justify-between text-ink-muted">
+                  <span data-i18n="beforeChicSort">Trước ChicSort:</span>
+                  <span class="text-rose-600 font-semibold" data-i18n="beforeChicSortVal">25 phút đắn đo</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-rose-400 h-2.5 rounded-full w-full"></div>
+                </div>
+                <div class="flex justify-between text-ink-muted pt-2">
+                  <span data-i18n="afterChicSort">Với ChicSort AI:</span>
+                  <span class="text-cobalt font-bold" data-i18n="afterChicSortVal">2.5 phút hoàn tất</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-cobalt h-2.5 rounded-full w-[10%]"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pillar 02: Wear More -->
+            <div class="pillar-card border border-slate-200 rounded-3xl p-8 sm:p-10 bg-white flex flex-col justify-between shadow-sm">
+              <div>
+                <span class="fashion-tag text-[#5379AE] font-bold mb-4 block">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#5379AE] inline-block"></span>
+                  <span data-i18n="p2Tag">Khai thác trọn vẹn tủ đồ</span>
+                </span>
+                <h3 class="font-display font-black text-2xl sm:text-3xl text-ink uppercase mb-3 leading-snug" data-i18n="wearMoreTitle">
+                  WEAR MORE: KHAI THÁC 100% TỦ ĐỒ
+                </h3>
+                <p class="text-ink-secondary text-base leading-relaxed mb-8" data-i18n="wearMoreDesc">
+                  Nâng tỷ lệ khai thác đồ sẵn có lên thêm ít nhất 30%. Tái khám phá các món đồ cất sâu trong tủ thông qua các thuật toán phối đa phong cách.
+                </p>
+              </div>
+              <div class="bg-paper p-6 border border-slate-200 rounded-2xl text-sm space-y-3">
+                <div class="flex justify-between items-center text-ink">
+                  <span class="font-semibold text-ink-secondary">Tần suất xoay vòng tủ đồ:</span>
+                  <span class="text-cobalt font-bold text-base">+30%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-cobalt h-2.5 rounded-full w-[80%]"></div>
+                </div>
+                <p class="text-xs text-ink-muted pt-1">Tự động gợi ý những món đồ cất sâu trong tủ để tránh lãng phí quần áo đã mua.</p>
+              </div>
+            </div>
+
+            <!-- Pillar 03: Shop Smarter -->
+            <div class="pillar-card border border-slate-200 rounded-3xl p-8 sm:p-10 bg-white flex flex-col justify-between shadow-sm">
+              <div>
+                <span class="fashion-tag text-[#06457F] font-bold mb-4 block">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#06457F] inline-block"></span>
+                  <span data-i18n="p3Tag">Mua sắm thông minh & có gu</span>
+                </span>
+                <h3 class="font-display font-black text-2xl sm:text-3xl text-ink uppercase mb-3 leading-snug" data-i18n="shopSmarterTitle">
+                  SHOP SMARTER: RADAR CHỐNG MUA TRÙNG
+                </h3>
+                <p class="text-ink-secondary text-base leading-relaxed mb-8" data-i18n="shopSmarterDesc">
+                  Tra cứu tủ đồ số trước khi bấm mua trên sàn thương mại điện tử. Xóa bỏ thói quen mua trùng lặp do ảo giác "không có gì để mặc".
+                </p>
+              </div>
+              <div class="bg-paper p-6 border border-slate-200 rounded-2xl text-sm space-y-3">
+                <div class="flex justify-between items-center text-ink">
+                  <span class="font-semibold text-ink-secondary">Cảnh báo trùng mẫu mã:</span>
+                  <span class="text-[#06457F] font-bold text-base">Chuẩn xác 94%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-[#0474C4] h-2.5 rounded-full w-[94%]"></div>
+                </div>
+                <p class="text-xs text-ink-muted pt-1">Báo động khi món sắp mua có kiểu dáng và màu sắc tương đương đồ đã có.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- === PERSONAS EDITORIAL DOSSIERS === -->
+      <section class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="mb-12">
+          <span class="fashion-badge">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span data-i18n="personaTag">Chân dung đồng hành</span>
+          </span>
+          <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase mt-3">
+            <span data-i18n="personaPre">HAI CHÂN DUNG</span> <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="personaPost">khách hàng mục tiêu</span>
+          </h2>
+          <p class="text-ink-muted text-xs mt-2" data-i18n="personaSub">
+            Xác thực trực tiếp từ thói quen thời trang của người trẻ đô thị
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- Dossier 01: Trần Thu Hà (Office Pro) -->
+          <div class="dossier-card">
+            <div class="flex items-start justify-between pb-6 border-b border-slate-100">
+              <div class="flex items-center gap-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" 
+                  alt="Ha Tran" 
+                  class="dossier-photo" 
+                />
+                <div>
+                  <h3 class="font-display font-black text-lg text-ink" data-i18n="p1Name">Trần Thu Hà, 25 tuổi</h3>
+                  <p class="text-xs text-ink-muted mt-0.5" data-i18n="p1Role">Chuyên viên Truyền thông · Target Gói Pro</p>
+                </div>
+              </div>
+              <span class="soft-pill active text-xs font-semibold" data-i18n="p1Badge">Quý cô Công sở</span>
+            </div>
+
+            <div class="pt-6 space-y-5 text-base">
+              <div>
+                <span class="text-xs font-bold text-rose-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                  <span data-i18n="painLabel">Băn khoăn mỗi sáng</span>
+                </span>
+                <p class="text-ink leading-relaxed" data-i18n="p1Pain">
+                  Mất 20 phút mỗi sáng chọn sơ mi và quần âu không nhăn. Áp lực giữ hình ảnh chỉn chu và rất sợ mặc trùng đồ cũ khi gặp khách hàng, đối tác.
+                </p>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-cobalt uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-cobalt"></span>
+                  <span data-i18n="expectLabel">Kỳ vọng cùng ChicSort</span>
+                </span>
+                <p class="text-ink-secondary leading-relaxed" data-i18n="p1Expect">
+                  Cần lưu lịch sử mặc chống trùng lặp và AI gợi ý Smart Casual theo đúng diễn biến thời tiết.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dossier 02: Nguyễn Khánh Linh (Student) -->
+          <div class="dossier-card">
+            <div class="flex items-start justify-between pb-6 border-b border-slate-100">
+              <div class="flex items-center gap-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" 
+                  alt="Linh Nguyen" 
+                  class="dossier-photo" 
+                />
+                <div>
+                  <h3 class="font-display font-black text-xl text-ink" data-i18n="p2Name">Nguyễn Khánh Linh, 20 tuổi</h3>
+                  <p class="text-sm text-ink-muted mt-1" data-i18n="p2Role">Sinh viên Đại học · Target Gói Freemium</p>
+                </div>
+              </div>
+              <span class="soft-pill border-[#5379AE] text-[#5379AE] text-sm font-semibold" data-i18n="p2Badge">Nữ sinh viên Năng động</span>
+            </div>
+
+            <div class="pt-6 space-y-5 text-base">
+              <div>
+                <span class="text-xs font-bold text-rose-600 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  <span data-i18n="painLabel">Băn khoăn mỗi sáng</span>
+                </span>
+                <p class="text-ink leading-relaxed" data-i18n="p2Pain">
+                  Ở phòng trọ nhỏ, cất đồ vào thùng dưới gầm giường nên quên hơn 40% đồ đã mua. Vội đi học ca sáng 7h, săn sale nhiều món lẻ trên Shopee nhưng bí ý tưởng kết hợp.
+                </p>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-cobalt uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cobalt"></span>
+                  <span data-i18n="expectLabel">Kỳ vọng cùng ChicSort</span>
+                </span>
+                <p class="text-ink-secondary leading-relaxed" data-i18n="p2Expect">
+                  Cần tủ đồ số tách nền nhanh và các gợi ý phối đồ mới mẻ từ quần áo cũ sẵn có.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </section>
+    <!-- END VIEW 1: PITCH -->
+
+
+    <!-- =============================================
+         VIEW 2: DIGITAL WARDROBE (TỦ ĐỒ SỐ)
+         ============================================= -->
+    <section id="view-wardrobe" class="view-panel hidden">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Wardrobe Header & Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-slate-200 mb-8">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <span class="fashion-badge">
+                <i data-lucide="hanger" class="w-3.5 h-3.5"></i>
+                <span data-i18n="wardrobeTag">Bộ sưu tập trang phục</span>
+              </span>
+              <span id="wardrobe-total-count" class="soft-pill bg-white text-ink text-sm font-semibold">12 trang phục</span>
+            </div>
+            <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase">
+              <span data-i18n="wardrobePre">TỦ QUẦN ÁO</span> <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="wardrobePost">kỹ thuật số</span>
+            </h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btn-open-upload" class="btn-editorial-primary text-sm py-2.5 px-5">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span data-i18n="btnAddItem">+ Thêm món đồ mới</span>
+            </button>
+            <button id="btn-reset-wardrobe" class="btn-editorial-secondary text-sm py-2.5 px-4">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span data-i18n="btnResetWardrobe">Khôi phục mẫu</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Pill Strip & Instant Search Bar -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-10">
+          <div class="flex flex-wrap gap-2.5">
+            <button class="soft-pill active" data-category-filter="all" data-i18n="filterAll">Tất cả (12)</button>
+            <button class="soft-pill" data-category-filter="tops" data-i18n="filterTops">Áo (4)</button>
+            <button class="soft-pill" data-category-filter="bottoms" data-i18n="filterBottoms">Quần & Váy (3)</button>
+            <button class="soft-pill" data-category-filter="outerwear" data-i18n="filterOuterwear">Áo khoác (2)</button>
+            <button class="soft-pill" data-category-filter="shoes" data-i18n="filterShoes">Giày dép (2)</button>
+            <button class="soft-pill" data-category-filter="accessories" data-i18n="filterAccessories">Phụ kiện (1)</button>
+          </div>
+          <div class="relative w-full md:w-80">
+            <input 
+              id="wardrobe-search" 
+              type="text" 
+              class="w-full bg-white border border-slate-200 px-4 py-3 pl-10 text-sm text-ink placeholder-slate-400 rounded-full focus:outline-none focus:border-cobalt transition"
+              data-i18n-placeholder="searchPlaceholder" 
+              placeholder="Tìm kiếm trang phục, gam màu, phong cách..." 
+            />
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          </div>
+        </div>
+
+        <!-- Staggered Garment Grid -->
+        <div id="wardrobe-grid">
+          <!-- Rendered dynamically via app.js -->
+        </div>
+
+      </div>
+    </section>
+    <!-- END VIEW 2: WARDROBE -->
+
+
+    <!-- =============================================
+         VIEW 3: AI STYLIST ASSISTANT
+         ============================================= -->
+    <section id="view-stylist" class="view-panel hidden">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Stylist Header -->
+        <div class="pb-8 border-b border-slate-200 mb-8">
+          <span class="fashion-badge">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span data-i18n="stylistTag">Gợi ý phong cách thông minh</span>
+          </span>
+          <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase mt-3">
+            <span data-i18n="stylistPre">TRỢ LÝ PHỐI ĐỒ</span> <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="stylistPost">trí tuệ nhân tạo</span>
+          </h2>
+          <p class="text-ink-secondary text-sm mt-1" data-i18n="stylistSub">
+            Gợi ý trang phục chỉn chu dưới 3 phút dựa trên đúng quần áo bạn đang sở hữu.
+          </p>
+        </div>
+
+        <!-- Context Control Console (Generously Spaced Options) -->
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 mb-12 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            
+            <!-- Weather Choices -->
+            <div>
+              <span class="text-sm sm:text-base font-bold text-ink-muted uppercase tracking-wider block mb-4 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-cobalt"></span>
+                <span data-i18n="weatherLabel">Thời tiết hôm nay</span>
+              </span>
+              <div class="grid grid-cols-2 gap-4 sm:gap-5">
+                <button class="soft-pill active py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-weather-choice="sunny">
+                  <span data-i18n="weatherSunny">Nắng ấm (26°C)</span>
+                </button>
+                <button class="soft-pill py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-weather-choice="rainy">
+                  <span data-i18n="weatherRainy">Mưa rào (18°C)</span>
+                </button>
+                <button class="soft-pill py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-weather-choice="cool">
+                  <span data-i18n="weatherCool">Mát mẻ (22°C)</span>
+                </button>
+                <button class="soft-pill py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-weather-choice="cold">
+                  <span data-i18n="weatherCold">Se lạnh (12°C)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Occasion Choices -->
+            <div>
+              <span class="text-sm sm:text-base font-bold text-ink-muted uppercase tracking-wider block mb-4 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#5379AE]"></span>
+                <span data-i18n="occasionLabel">Bối cảnh lịch trình</span>
+              </span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                <button class="soft-pill active py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-occasion-choice="work">
+                  <span data-i18n="occasionWork">Công sở</span>
+                </button>
+                <button class="soft-pill py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-occasion-choice="campus">
+                  <span data-i18n="occasionCampus">Giảng đường</span>
+                </button>
+                <button class="soft-pill py-3.5 px-4 text-sm sm:text-base font-semibold justify-center rounded-2xl" data-occasion-choice="weekend">
+                  <span data-i18n="occasionWeekend">Cuối tuần</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Trigger Controls -->
+          <div class="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-4 items-center justify-between">
+            <button id="btn-generate-outfits" class="btn-editorial-primary text-base py-3.5 px-8 flex-1 sm:flex-none">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span data-i18n="btnGenerate">Tạo 3 gợi ý phối đồ AI</span>
+            </button>
+            <button id="btn-shuffle-outfits" class="btn-editorial-secondary text-base py-3.5 px-6">
+              <i data-lucide="shuffle" class="w-4 h-4"></i>
+              <span data-i18n="btnShuffle">Đổi phối khác</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Outfits Container (3 distinct editorial cards with ample spacing) -->
+        <div id="stylist-outfits-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+          <!-- Rendered dynamically via app.js -->
+        </div>
+
+        <!-- VirtualFit Spatial 3D Try-On Showcase Banner -->
+        <div class="vf-stylist-banner mt-12 p-8 sm:p-10 rounded-3xl border border-slate-200 relative overflow-hidden shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+          <div class="max-w-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="fashion-badge">
+                <i data-lucide="scan-line" class="w-3.5 h-3.5 text-cobalt"></i>
+                <span data-i18n="virtualFitBannerTag">Thử đồ không gian 3D</span>
+              </span>
+              <span class="soft-pill bg-cobalt text-white border-cobalt text-xs font-bold">visionOS Spatial</span>
+            </div>
+            <h3 class="font-display font-black text-2xl text-ink uppercase tracking-tight" data-i18n="virtualFitBannerTitle">
+              PHÒNG THỬ ĐỒ KHÔNG GIAN 3D VIRTUALFIT
+            </h3>
+            <p class="text-sm sm:text-base text-ink-secondary mt-2 leading-relaxed" data-i18n="virtualFitBannerDesc">
+              Trải nghiệm ướm trang phục thời gian thực theo phong cách visionOS với vòm thẻ kính 3D và hiệu ứng quét laser AI chân thực.
+            </p>
+          </div>
+          <a href="virtualfit.html" class="btn-editorial-primary text-sm py-3.5 px-7 whitespace-nowrap shadow-lg hover:shadow-xl transition-all flex items-center gap-2 rounded-full shrink-0">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span data-i18n="btnLaunchVirtualFit">Mở phòng thử đồ 3D</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+    <!-- END VIEW 3: STYLIST -->
+
+
+    <!-- =============================================
+         VIEW 4: WEAR LOG / CALENDAR LEDGER
+         ============================================= -->
+    <section id="view-calendar" class="view-panel hidden">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <div class="pb-8 border-b border-slate-200 mb-8">
+          <span class="fashion-badge">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span data-i18n="calendarTag">Lịch sử trang phục</span>
+          </span>
+          <h2 class="font-display font-black text-3xl sm:text-4xl text-ink tracking-tight uppercase mt-3">
+            <span data-i18n="calendarPre">NHẬT KÝ MẶC ĐỒ</span> <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="calendarPost">& chống trùng lặp</span>
+          </h2>
+          <p class="text-ink-secondary text-base mt-2" data-i18n="calendarSub">
+            Theo dõi tần suất mặc để không bị lặp lại trang phục trong các buổi họp quan trọng.
+          </p>
+        </div>
+
+        <!-- Radar Alert Bar -->
+        <div class="radar-alert-bar p-6 sm:p-8 rounded-3xl border mb-10 flex items-start gap-5 shadow-sm">
+          <div class="w-12 h-12 rounded-full bg-[#0474C4] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xs sm:text-sm font-bold text-[#06457F] uppercase tracking-wide block mb-1.5 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#0474C4]"></span>
+              <span data-i18n="antiRepeatBadge">Gợi ý luân phiên trang phục</span>
+            </span>
+            <p class="text-ink text-sm sm:text-base leading-relaxed" data-i18n="antiRepeatNotice">
+              Nhắc nhở thông minh: Bạn đã 25 ngày chưa mặc chiếc Áo Cardigan dệt kim màu kem. Hãy thử diện món này hôm nay.
+            </p>
+          </div>
+        </div>
+
+        <!-- Chronological Ledger List -->
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100 shadow-sm" id="calendar-logs-list">
+          <!-- Rendered dynamically via app.js -->
+        </div>
+
+      </div>
+    </section>
+    <!-- END VIEW 4: CALENDAR -->
+
+
+    <!-- =============================================
+         VIEW 5: TRANSPARENT PRICING PLANS
+         ============================================= -->
+    <section id="view-pricing" class="view-panel hidden">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <span class="fashion-badge">
+            <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+            <span data-i18n="pricingTag">Bảng giá dịch vụ</span>
+          </span>
+          <h2 class="font-display font-black text-3xl sm:text-5xl text-ink tracking-tight uppercase mt-3">
+            <span data-i18n="pricingPre">MÔ HÌNH DOANH THU</span> <span class="font-serif-italic text-cobalt font-normal lowercase tracking-normal" data-i18n="pricingPost">minh bạch</span>
+          </h2>
+          <p class="text-ink-secondary text-sm sm:text-base mt-2" data-i18n="pricingSub">
+            Khởi đầu miễn phí cho sinh viên, nâng cấp chuyên nghiệp cho người đi làm.
+          </p>
+        </div>
+
+        <!-- Pricing Grid (Hairline Boxed Layout) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          
+          <!-- Plan 01: Freemium Explorer -->
+          <div class="pricing-plan-box">
+            <span class="soft-pill bg-slate-100 text-ink-secondary text-sm font-semibold" data-i18n="freeTierTag">Gói Khám Phá</span>
+            <div class="mt-6 mb-6">
+              <span class="font-display font-black text-4xl sm:text-5xl text-ink block leading-none" data-i18n="freeTierPrice">
+                0 VNĐ
+              </span>
+              <span class="text-sm text-ink-muted uppercase mt-2 block font-medium" data-i18n="freeTierPeriod">
+                Miễn phí trọn đời
+              </span>
+            </div>
+            
+            <div class="space-y-4 text-sm text-ink-secondary pb-8 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cobalt shrink-0"></i>
+                <span data-i18n="freeTierF1">Quản lý tối đa 50 món đồ trong tủ</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cobalt shrink-0"></i>
+                <span data-i18n="freeTierF2">Gợi ý AI phối đồ hàng ngày (3 bộ/ngày)</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cobalt shrink-0"></i>
+                <span data-i18n="freeTierF3">Tự động tách nền AI tiêu chuẩn</span>
+              </div>
+            </div>
+
+            <div class="pt-8">
+              <button class="btn-editorial-secondary w-full text-base py-3" data-i18n="freeTierBtn">
+                Gói Đang Dùng
+              </button>
+            </div>
+          </div>
+
+          <!-- Plan 02: ChicSort Pro Stylist (Featured Dark Block) -->
+          <div class="pricing-plan-box featured">
+            <div class="flex justify-between items-center">
+              <span class="soft-pill bg-white/10 text-[#A8C4EC] border-white/20 text-sm font-semibold" data-i18n="proTierTag">Gói ChicSort Pro</span>
+              <span class="soft-pill bg-cobalt text-white border-cobalt text-sm font-bold" data-i18n="proTierBadge">Lựa chọn phổ biến</span>
+            </div>
+
+            <div class="mt-6 mb-6">
+              <span class="font-display font-black text-4xl sm:text-5xl text-white block leading-none" data-i18n="proTierPrice">
+                49.000 VNĐ
+              </span>
+              <span class="text-sm text-slate-400 uppercase mt-2 block font-medium" data-i18n="proTierPeriod">
+                /tháng (hoặc 399.000 VNĐ/năm)
+              </span>
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-300 pb-8 border-b border-white/10">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-[#A8C4EC] shrink-0"></i>
+                <span data-i18n="proTierF1">Không giới hạn số lượng đồ và đồng bộ ảnh TMĐT</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-[#A8C4EC] shrink-0"></i>
+                <span data-i18n="proTierF2">Lịch sử mặc chống trùng lặp thông minh</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-[#A8C4EC] shrink-0"></i>
+                <span data-i18n="proTierF3">Radar cảnh báo mua trùng trước khi mua mới</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-[#A8C4EC] shrink-0"></i>
+                <span data-i18n="proTierF4">Phân tích phom dáng vải AI độ nét cao</span>
+              </div>
+            </div>
+
+            <div class="pt-8">
+              <button class="btn-editorial-primary w-full text-base py-3" data-i18n="proTierBtn">
+                Nâng cấp Gói Pro
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+    <!-- END VIEW 5: PRICING -->
+
+
+    <!-- =============================================
+         VIEW 6: INTERNAL OPERATIONS ADMIN PORTAL
+         ============================================= -->
+    <section id="view-admin" class="view-panel hidden">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Admin Login Screen -->
+        <div id="admin-login-card" class="max-w-md mx-auto py-8">
+          <div class="border border-slate-200 bg-white rounded-2xl p-8 shadow-sm">
+            <div class="text-center pb-6 border-b border-slate-100">
+              <span class="fashion-badge">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                <span data-i18n="adminBadge">Cổng bảo mật</span>
+              </span>
+              <h2 class="font-display font-black text-2xl text-ink uppercase mt-3" data-i18n="adminLoginTitle">
+                CỔNG QUẢN TRỊ VIÊN
+              </h2>
+              <p class="text-xs text-ink-muted mt-1.5" data-i18n="adminLoginSub">
+                Cổng bảo mật nội bộ dành riêng cho quản trị hệ thống ChicSort.
+              </p>
+            </div>
+
+            <form id="admin-login-form" class="pt-6 space-y-4 text-sm">
+              <div>
+                <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="adminEmailLabel">Email Quản Trị</label>
+                <input id="admin-email" type="email" class="w-full border border-slate-200 p-3.5 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none" placeholder="admin@chicsort.com" />
+              </div>
+              <div>
+                <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="adminPasswordLabel">Mật Khẩu</label>
+                <input id="admin-password" type="password" class="w-full border border-slate-200 p-3.5 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none" placeholder="••••••••" />
+              </div>
+
+              <div id="admin-login-error" class="hidden p-3.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-600 text-sm" data-i18n="adminAuthError">
+                Email hoặc mật khẩu không chính xác.
+              </div>
+
+              <button type="submit" class="btn-editorial-primary w-full text-sm py-3.5">
+                <span data-i18n="btnAdminSignIn">Đăng nhập hệ thống</span>
+              </button>
+
+              <button type="button" id="btn-fill-admin-demo" class="btn-editorial-secondary w-full text-sm py-3">
+                <span data-i18n="btnFillAdminDemo">Bấm để điền nhanh Demo</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Admin Live Dashboard (Post Login) -->
+        <div id="admin-dashboard-view" class="hidden">
+          <div class="flex justify-between items-end pb-6 border-b border-slate-200 mb-8">
+            <div>
+              <span class="fashion-badge">
+                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
+                <span data-i18n="adminReportBadge">Báo cáo vận hành</span>
+              </span>
+              <h2 class="font-display font-black text-3xl sm:text-4xl text-ink uppercase mt-3" data-i18n="adminTitle">
+                CỔNG QUẢN TRỊ & VẬN HÀNH CHICSORT
+              </h2>
+            </div>
+            <button id="btn-exit-admin" class="btn-editorial-secondary text-sm py-2.5 px-5">
+              <span data-i18n="btnExitAdmin">Thoát Admin</span>
+            </button>
+          </div>
+
+          <!-- KPI Cards Strip -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <span class="text-sm text-ink-muted font-bold block mb-2" data-i18n="kpiTotalUsers">Tổng Người Dùng</span>
+              <p class="font-display font-black text-3xl sm:text-4xl text-ink">212</p>
+              <p class="text-xs text-ink-muted mt-1.5" data-i18n="kpiTotalUsersDesc">Khảo sát mẫu Hà Nội & TP.HCM</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <span class="text-sm text-ink-muted font-bold block mb-2" data-i18n="kpiActiveUsers">Tỷ Lệ Đón Nhận</span>
+              <p class="font-display font-black text-3xl sm:text-4xl text-cobalt">78%</p>
+              <p class="text-xs text-ink-muted mt-1.5" data-i18n="kpiActiveUsersDesc">Đánh giá 4-5 sao</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <span class="text-sm text-ink-muted font-bold block mb-2" data-i18n="kpiItemsUploaded">Đồ Đã Số Hóa</span>
+              <p class="font-display font-black text-3xl sm:text-4xl text-ink">1,847</p>
+              <p class="text-xs text-ink-muted mt-1.5" data-i18n="kpiItemsUploadedDesc">Tách nền thành công</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <span class="text-sm text-ink-muted font-bold block mb-2" data-i18n="kpiProjectedRev">MRR Dự Phóng</span>
+              <p class="font-display font-black text-3xl sm:text-4xl text-cobalt">2.4M</p>
+              <p class="text-xs text-ink-muted mt-1.5" data-i18n="kpiProjectedRevDesc">VNĐ / tháng</p>
+            </div>
+          </div>
+
+          <!-- Users Cohort Ledger Table -->
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-paper border-b border-slate-200 text-ink-muted font-bold">
+                <tr>
+                  <th class="p-4" data-i18n="colId">Mã số</th>
+                  <th class="p-4" data-i18n="colUser">Người dùng</th>
+                  <th class="p-4" data-i18n="colPersona">Phân khúc</th>
+                  <th class="p-4" data-i18n="colPlan">Gói cước</th>
+                  <th class="p-4 text-center" data-i18n="colItems">Món đồ</th>
+                  <th class="p-4 text-center" data-i18n="colOutfits">Lượt gợi ý</th>
+                  <th class="p-4" data-i18n="colStatus">Trạng thái</th>
+                  <th class="p-4 text-right" data-i18n="colAction">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table" class="divide-y divide-slate-100 font-sans">
+                <!-- Rendered dynamically via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <!-- END VIEW 6: ADMIN -->
+
+  </main>
+
+  <!-- =========================================
+       FOOTER (No Em-dashes, Discreet Admin Link)
+       ========================================= -->
+  <footer class="border-t border-slate-200 bg-white mt-24">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-ink-muted">
+      <div class="flex items-center gap-3">
+        <span class="font-display font-black text-ink uppercase tracking-wider text-base">CHICSORT</span>
+        <span class="text-slate-300">/</span>
+        <span data-i18n="footerTagline">Thời trang thông minh · Tủ đồ số cá nhân</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs sm:text-sm">
+        <span>© 2026 ChicSort</span>
+        <span class="text-slate-300">·</span>
+        <!-- Hidden admin entry point -->
+        <a href="#admin" class="hover:text-cobalt transition-colors font-semibold opacity-70 hover:opacity-100" data-i18n="footerAdminLink">Cổng quản trị</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================
+       MODAL: DIGITIZE GARMENT DIALOG
+       ========================================= -->
+  <div id="modal-upload" class="editorial-modal-backdrop hidden">
+    <div class="editorial-modal-panel p-6 sm:p-8">
+      
+      <div class="flex justify-between items-start pb-4 border-b border-slate-100 mb-6">
+        <div>
+          <span class="fashion-badge">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span data-i18n="modalUploadBadge">Số hóa trang phục bằng AI</span>
+          </span>
+          <h3 class="font-display font-black text-2xl text-ink uppercase mt-2" data-i18n="modalUploadTitle">
+            TÁCH NỀN VÀ PHÂN LOẠI TỦ ĐỒ
+          </h3>
+          <p class="text-sm text-ink-muted mt-1.5" data-i18n="modalUploadSub">
+            Chọn file ảnh bất kỳ từ máy tính của bạn để AI tự động tách nền.
+          </p>
+        </div>
+        <button id="btn-close-upload" class="text-ink-muted hover:text-ink p-1.5 rounded-full hover:bg-slate-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Dropzone -->
+      <div id="upload-dropzone" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-paper cursor-pointer hover:border-cobalt transition-colors">
+        <input id="file-upload-input" type="file" accept="image/*" class="hidden" />
+        <div class="w-12 h-12 rounded-full bg-blue-50 text-cobalt flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+        </div>
+        <p class="text-sm font-bold text-ink mb-1" data-i18n="dropzoneText">
+          Kéo thả ảnh vào đây, hoặc bấm để duyệt từ máy tính
+        </p>
+        <p class="text-xs text-ink-muted" data-i18n="dropzoneSub">PNG, JPG, WEBP hỗ trợ tối đa 10MB</p>
+      </div>
+
+      <!-- Scanning Preview -->
+      <div id="upload-scan-preview" class="hidden pt-6">
+        <div class="relative bg-slate-900 rounded-2xl aspect-square max-w-[240px] mx-auto overflow-hidden shadow-inner">
+          <img id="scan-target-img" class="w-full h-full object-contain" src="" alt="Target" />
+          <div class="absolute inset-0 bg-cobalt/20 animate-pulse"></div>
+        </div>
+        <div id="scan-status-text" class="text-center text-sm text-cobalt font-semibold mt-4" data-i18n="aiScanningText">
+          AI đang tách viền vải và nhận diện phom dáng...
+        </div>
+      </div>
+
+      <!-- Editable Form After Scan -->
+      <div id="upload-form-section" class="hidden pt-6 space-y-4 text-sm">
+        <div>
+          <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="editNameLabel">Tên món đồ</label>
+          <input id="upload-item-name" type="text" class="w-full border border-slate-200 p-3 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="editCategoryLabel">Ngăn tủ (Danh mục)</label>
+          <select id="upload-item-category" class="w-full border border-slate-200 p-3 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none bg-white">
+            <option value="tops" data-i18n="optTops">Áo (Tops)</option>
+            <option value="bottoms" data-i18n="optBottoms">Quần & Váy (Bottoms)</option>
+            <option value="outerwear" data-i18n="optOuterwear">Áo khoác (Outerwear)</option>
+            <option value="shoes" data-i18n="optShoes">Giày dép (Shoes)</option>
+            <option value="accessories" data-i18n="optAccessories">Phụ kiện (Accessories)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="editColorLabel">Màu sắc</label>
+            <input id="upload-item-color" type="text" class="w-full border border-slate-200 p-3 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none" />
+          </div>
+          <div>
+            <label class="text-ink-muted block uppercase mb-1.5 font-bold text-xs" data-i18n="editStyleLabel">Phong cách</label>
+            <input id="upload-item-style" type="text" class="w-full border border-slate-200 p-3 rounded-xl text-ink text-sm focus:border-cobalt focus:outline-none" />
+          </div>
+        </div>
+        <div class="pt-4 flex gap-3">
+          <button id="btn-save-uploaded-item" class="btn-editorial-primary flex-1 text-sm py-3">
+            <span data-i18n="btnSaveGarment">Lưu vào tủ đồ</span>
+          </button>
+          <button id="btn-cancel-upload" class="btn-editorial-secondary text-sm py-3 px-5">
+            <span data-i18n="btnCancel">Hủy</span>
+          </button>
+        </div>
+      </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/virtualfit-hero.js"></script>
+
+  <script>
+    // Lucide Icons Render
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+
+    // Mobile Navigation Controls
+    const mobileDrawer = document.getElementById('mobile-nav-drawer');
+    const btnMobileMenu = document.getElementById('btn-mobile-menu');
+    const btnCloseMobile = document.getElementById('btn-close-mobile-menu');
+    const mobileBackdrop = document.getElementById('mobile-nav-backdrop');
+
+    function openMobileMenu() {
+      mobileDrawer.classList.remove('pointer-events-none', 'opacity-0');
+      mobileDrawer.classList.add('opacity-100');
+    }
+
+    function closeMobileMenu() {
+      mobileDrawer.classList.add('pointer-events-none', 'opacity-0');
+      mobileDrawer.classList.remove('opacity-100');
+    }
+
+    if (btnMobileMenu) btnMobileMenu.addEventListener('click', openMobileMenu);
+    if (btnCloseMobile) btnCloseMobile.addEventListener('click', closeMobileMenu);
+    if (mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobileMenu);
+
+    document.querySelectorAll('#mobile-nav-drawer button[data-nav-tab]').forEach(btn => {
+      btn.addEventListener('click', closeMobileMenu);
+    });
+
+    // Delegated Hotspot Popover Handler
+    document.addEventListener('click', (e) => {
+      const trigger = e.target.closest('.hotspot-trigger');
+      if (trigger) {
+        e.stopPropagation();
+        const popover = trigger.nextElementSibling;
+        if (popover && popover.classList.contains('hotspot-popover')) {
+          document.querySelectorAll('.hotspot-popover.visible').forEach(p => {
+            if (p !== popover) p.classList.remove('visible');
+          });
+          popover.classList.toggle('visible');
+        }
+        return;
+      }
+      document.querySelectorAll('.hotspot-popover.visible').forEach(p => p.classList.remove('visible'));
+    });
+  </script>
+</body>
+</html>
