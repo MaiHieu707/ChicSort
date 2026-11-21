@@ -682,38 +682,44 @@ body {
    ============================================================ */
 
 .editorial-ticker {
-  background: #161C2B;
-  color: #F2F6FC;
-  padding: 14px 0;
+  background: #262B40 !important;
+  color: #FFFFFF !important;
+  padding: 16px 0;
   overflow: hidden;
   font-family: var(--font-display);
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  border-top: 1px solid rgba(168, 196, 236, 0.12);
-  border-bottom: 1px solid rgba(168, 196, 236, 0.12);
+  border-top: 1px solid rgba(168, 196, 236, 0.18);
+  border-bottom: 1px solid rgba(168, 196, 236, 0.18);
 }
 
 .editorial-ticker span {
-  color: #F2F6FC;
+  color: #FFFFFF !important;
+}
+
+.editorial-ticker .ticker-dot {
+  color: #A8C4EC !important;
+  margin: 0 16px;
 }
 
 html.dark .editorial-ticker {
   background: #0B0E17 !important;
-  color: #F2F6FC !important;
+  color: #FFFFFF !important;
   border-top: 1px solid var(--border-hairline) !important;
   border-bottom: 1px solid var(--border-hairline) !important;
 }
 
 html.dark .editorial-ticker span {
-  color: #F2F6FC !important;
+  color: #FFFFFF !important;
 }
 
 .ticker-track {
   display: flex;
+  align-items: center;
   white-space: nowrap;
-  animation: tickerSlide 35s linear infinite;
-  gap: 32px;
+  animation: tickerSlide 40s linear infinite;
+  gap: 48px;
 }
 
 .ticker-track:hover {
@@ -892,10 +898,6 @@ html.dark .editorial-ticker span {
   #wardrobe-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 36px;
-  }
-  /* Stagger every even column down by 36px */
-  #wardrobe-grid > *:nth-child(even) {
-    margin-top: 36px;
   }
 }
 
@@ -1184,17 +1186,21 @@ html.dark .editorial-ticker span {
 .outfit-thumbnails-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 10px;
+  gap: 12px;
+  padding: 14px;
   background: var(--paper);
   border: 1px solid var(--border-hairline);
+  border-radius: 18px;
 }
 
 .outfit-thumb-cell {
   aspect-ratio: 3/4;
   overflow: hidden;
   background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-hairline);
   position: relative;
+  box-shadow: 0 1px 4px rgba(38, 43, 64, 0.05);
 }
 
 .outfit-thumb-img {
@@ -1366,9 +1372,9 @@ html.dark .user-dropdown-menu {
 /* Style Select Cards (Onboarding Step 2) */
 .style-select-card {
   background: white;
-  border: 1px solid var(--border-hairline);
-  border-radius: 18px;
-  padding: 16px;
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 20px 18px;
   text-align: left;
   cursor: pointer;
   position: relative;
@@ -1382,8 +1388,8 @@ html.dark .user-dropdown-menu {
 }
 
 .style-select-card.active {
-  border-color: var(--cobalt);
-  background: rgba(4, 116, 196, 0.08);
+  border-color: var(--cobalt) !important;
+  background: rgba(4, 116, 196, 0.08) !important;
   box-shadow: 0 0 0 1.5px var(--cobalt);
 }
 
@@ -1399,6 +1405,80 @@ html.dark .style-select-card:hover {
 html.dark .style-select-card.active {
   border-color: var(--cobalt);
   background: rgba(4, 116, 196, 0.22);
+}
+
+/* ============================================================
+   CALENDAR WEAR LOG CARDS & DATE BADGES
+   ============================================================ */
+
+.calendar-log-card {
+  background: white;
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.25s ease;
+  margin-bottom: 16px;
+}
+
+.calendar-log-card:hover {
+  border-color: var(--color-steel);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.calendar-date-badge {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  min-height: 68px;
+  border-radius: 18px;
+  border: 1px solid var(--border-hairline);
+  background: var(--cobalt-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(4, 116, 196, 0.06);
+}
+
+.calendar-date-badge .badge-month {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cobalt);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.calendar-date-badge .badge-day {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+html.dark .calendar-log-card {
+  background: #111522;
+  border-color: var(--border-hairline);
+}
+
+html.dark .calendar-log-card:hover {
+  border-color: var(--color-steel);
+}
+
+html.dark .calendar-date-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .calendar-date-badge .badge-day {
+  color: #FFFFFF;
 }
 
 /* ============================================================
@@ -1823,11 +1903,11 @@ html.dark .vf-arrow-btn {
 }
 
 .vf-arrow-prev {
-  left: calc(max(18px, 1.8vw) + 72px);
+  left: max(20px, 2.5vw);
 }
 
 .vf-arrow-next {
-  right: max(18px, 1.8vw);
+  right: max(20px, 2.5vw);
 }
 
 .vf-buy {

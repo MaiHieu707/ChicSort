@@ -316,10 +316,10 @@ class ChicSortApp {
     if (!track) return;
     const d = this.data.dict[this.lang];
     const items = [d.tickerItem1, d.tickerItem2, d.tickerItem3, d.tickerItem4, d.tickerItem5];
-    const repeated = [...items, ...items];
+    const repeated = [...items, ...items, ...items];
     track.innerHTML = repeated.map(item => `
-      <span>${item}</span>
-      <span class="text-[#A8C4EC] font-bold">·</span>
+      <span class="inline-flex items-center text-white font-medium px-2">${item}</span>
+      <span class="ticker-dot text-[#A8C4EC] font-bold select-none">·</span>
     `).join('');
   }
 
@@ -812,7 +812,7 @@ class ChicSortApp {
 
     const isVi = this.lang === 'vi';
     if (this.wearLogs.length === 0) {
-      list.innerHTML = `<p class="text-sm text-slate-400 py-6 text-center">${isVi ? 'Chưa có lịch sử mặc đồ nào được ghi nhận.' : 'No wear history recorded yet.'}</p>`;
+      list.innerHTML = `<p class="text-sm text-slate-400 py-8 text-center">${isVi ? 'Chưa có lịch sử mặc đồ nào được ghi nhận.' : 'No wear history recorded yet.'}</p>`;
       return;
     }
 
@@ -831,18 +831,18 @@ class ChicSortApp {
       const monthLabel = isVi ? `Th ${monthNum}` : (monthNamesEn[monthNum - 1] || `M${monthNum}`);
 
       return `
-        <div class="p-4 sm:p-5 flex items-center justify-between gap-4 text-sm hover:bg-slate-50/50 dark:hover:bg-white/5 transition">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl border border-slate-200 dark:border-white/10 bg-paper dark:bg-white/5 flex flex-col items-center justify-center shrink-0 shadow-xs">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-cobalt leading-none mb-1">${monthLabel}</span>
-              <span class="text-xl font-display font-black text-ink leading-none">${dayNum}</span>
+        <div class="calendar-log-card flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div class="flex items-center gap-5">
+            <div class="calendar-date-badge">
+              <span class="badge-month">${monthLabel}</span>
+              <span class="badge-day">${dayNum}</span>
             </div>
             <div>
-              <h4 class="font-display font-bold text-base text-ink mb-1">${log.outfitName}</h4>
-              <p class="text-sm text-ink-muted">${log.items ? log.items.join(' · ') : (isVi ? 'Phối đồ hoàn chỉnh' : 'Full Outfit')}</p>
+              <h4 class="font-display font-bold text-base text-ink mb-1.5 leading-snug">${log.outfitName}</h4>
+              <p class="text-sm text-ink-muted leading-relaxed">${log.items ? log.items.join(' · ') : (isVi ? 'Phối đồ hoàn chỉnh' : 'Full Outfit')}</p>
             </div>
           </div>
-          <span class="soft-pill text-xs font-semibold shrink-0">${occMap[log.occasion] || log.occasion}</span>
+          <span class="soft-pill text-xs font-semibold shrink-0 self-start sm:self-center">${occMap[log.occasion] || log.occasion}</span>
         </div>
       `;
     }).join('');
