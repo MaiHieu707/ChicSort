@@ -41,6 +41,13 @@ class ChicSortApp {
     this.currentOutfits = [];
     this.isAdminAuthenticated = false;
 
+    // User profile and style archetype state
+    const savedUser = localStorage.getItem('chicsort_user');
+    this.currentUser = savedUser ? JSON.parse(savedUser) : null;
+    this.currentStyle = (this.currentUser && this.currentUser.style) || 'office';
+    this.pendingAuthUser = null;
+    this.selectedOnboardingStyle = this.currentStyle;
+
     // Theme state
     this.theme = localStorage.getItem('chicsort_theme') || 'light';
 
@@ -55,6 +62,9 @@ class ChicSortApp {
     // Apply theme
     this.applyTheme(this.theme);
 
+    // Initialize User Auth & Style Onboarding
+    this.initAuth();
+
     // Check initial hash route (e.g. #admin, #wardrobe, #stylist)
     const hash = window.location.hash.replace('#', '') || 'pitch';
     this.switchTab(hash);
@@ -67,6 +77,9 @@ class ChicSortApp {
 
     // Render initial language texts & ticker
     this.setLanguage(this.lang);
+
+    // Update user auth UI
+    this.updateUserAuthUI();
 
     // Initialize Lucide icons
     if (window.lucide) {
@@ -280,6 +293,7 @@ class ChicSortApp {
 
     this.applyLanguage();
     this.renderTicker();
+    this.updateUserAuthUI();
     this.renderWardrobe();
     this.generateOutfits();
     this.renderCalendar();
@@ -678,9 +692,34 @@ class ChicSortApp {
     }
 
     setTimeout(() => {
-      this.currentOutfits = this.data.getOutfits(this.currentWeather, this.currentOccasion);
+      this.currentOutfits = this.data.getOutfits(this.currentWeather, this.currentOccasion, this.currentStyle);
       const isVi = this.lang === 'vi';
       const d = this.data.dict[this.lang];
+
+      // Sync active state on stylist style pills
+      document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
+        const s = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
+        if (s === this.currentStyle) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Update matched style note in console header
+      const noteEl = document.getElementById('user-matched-style-note');
+      if (noteEl) {
+        const styleName = this.getStyleDisplayName(this.currentStyle);
+        if (this.currentUser) {
+          noteEl.textContent = isVi 
+            ? `Đang ưu tiên gợi ý theo gu: ${styleName}`
+            : `Prioritizing looks for your aesthetic: ${styleName}`;
+        } else {
+          noteEl.textContent = isVi
+            ? `Gợi ý số 1 đang ưu tiên theo gu: ${styleName}`
+            : `Look #1 tailored for archetype: ${styleName}`;
+        }
+      }
 
       container.innerHTML = this.currentOutfits.map((outfit, index) => {
         // Resolve items
@@ -871,6 +910,357 @@ class ChicSortApp {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 400);
     }, 3200);
+  }
+
+  getStyleDisplayName(styleId) {
+    const isVi = this.lang === 'vi';
+    const dict = {
+      office: isVi ? 'Công sở Thanh lịch' : 'Office Chic',
+      minimal: isVi ? 'Tối giản Hiện đại' : 'Clean Minimal',
+      streetwear: isVi ? 'Trẻ trung Phố thị' : 'Youthful Streetwear',
+      soft: isVi ? 'Dịu dàng Tinh tế' : 'Soft Elegance',
+      athleisure: isVi ? 'Thể thao Thường nhật' : 'Athleisure',
+      vintage: isVi ? 'Cổ điển Hoài niệm' : 'Retro Vintage'
+    };
+    return dict[styleId] || styleId;
+  }
+
+  selectOnboardingCard(styleId) {
+    this.selectedOnboardingStyle = styleId;
+    document.querySelectorAll('#onboarding-styles-grid .style-select-card').forEach(card => {
+      const s = card.getAttribute('data-style-id');
+      const checkMark = card.querySelector('.style-check-mark');
+      if (s === styleId) {
+        card.classList.add('active');
+        if (checkMark) checkMark.classList.remove('hidden');
+      } else {
+        card.classList.remove('active');
+        if (checkMark) checkMark.classList.add('hidden');
+      }
+    });
+  }
+
+  updateUserAuthUI() {
+    const isVi = this.lang === 'vi';
+    const headerAuthBtn = document.getElementById('btn-header-auth');
+    const headerUserProfile = document.getElementById('header-user-profile');
+    const mobileLoggedOut = document.getElementById('mobile-auth-logged-out');
+    const mobileLoggedIn = document.getElementById('mobile-auth-logged-in');
+
+    const styleName = this.getStyleDisplayName(this.currentStyle);
+
+    if (this.currentUser) {
+      if (headerAuthBtn) headerAuthBtn.classList.add('hidden');
+      if (headerUserProfile) headerUserProfile.classList.remove('hidden');
+
+      const avatarEl = document.getElementById('header-user-avatar');
+      const nameEl = document.getElementById('header-user-name');
+      const badgeEl = document.getElementById('header-user-style-badge');
+      const dropName = document.getElementById('dropdown-user-name');
+      const dropEmail = document.getElementById('dropdown-user-email');
+      const dropStyle = document.getElementById('dropdown-user-style');
+
+      const avatarUrl = this.currentUser.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80';
+      if (avatarEl) avatarEl.src = avatarUrl;
+      if (nameEl) {
+        const parts = (this.currentUser.name || '').trim().split(' ');
+        nameEl.textContent = parts[parts.length - 1] || this.currentUser.name;
+      }
+      if (badgeEl) badgeEl.textContent = styleName;
+      if (dropName) dropName.textContent = this.currentUser.name;
+      if (dropEmail) dropEmail.textContent = this.currentUser.email;
+      if (dropStyle) dropStyle.textContent = `Gu: ${styleName}`;
+
+      // Mobile drawer
+      if (mobileLoggedOut) mobileLoggedOut.classList.add('hidden');
+      if (mobileLoggedIn) mobileLoggedIn.classList.remove('hidden');
+      const mobAvatar = document.getElementById('mobile-user-avatar');
+      const mobName = document.getElementById('mobile-user-name');
+      const mobStyle = document.getElementById('mobile-user-style');
+      if (mobAvatar) mobAvatar.src = avatarUrl;
+      if (mobName) mobName.textContent = this.currentUser.name;
+      if (mobStyle) mobStyle.textContent = `${styleName} (${this.currentUser.plan || 'Free'})`;
+    } else {
+      if (headerAuthBtn) headerAuthBtn.classList.remove('hidden');
+      if (headerUserProfile) headerUserProfile.classList.add('hidden');
+      const userDropdown = document.getElementById('user-profile-dropdown');
+      if (userDropdown) userDropdown.classList.add('hidden');
+
+      // Mobile drawer
+      if (mobileLoggedOut) mobileLoggedOut.classList.remove('hidden');
+      if (mobileLoggedIn) mobileLoggedIn.classList.add('hidden');
+    }
+
+    // Update style pills in AI Stylist console
+    document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
+      const s = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
+      if (s === this.currentStyle) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    const noteEl = document.getElementById('user-matched-style-note');
+    if (noteEl) {
+      if (this.currentUser) {
+        noteEl.textContent = isVi 
+          ? `Đang ưu tiên gợi ý theo gu: ${styleName}`
+          : `Prioritizing looks for your aesthetic: ${styleName}`;
+      } else {
+        noteEl.textContent = isVi
+          ? `Gợi ý số 1 đang ưu tiên theo gu: ${styleName}`
+          : `Look #1 tailored for archetype: ${styleName}`;
+      }
+    }
+  }
+
+  initAuth() {
+    const modal = document.getElementById('modal-auth');
+    if (!modal) return;
+
+    const step1 = document.getElementById('auth-step-1');
+    const step2 = document.getElementById('auth-step-2');
+    const tabSignIn = document.getElementById('tab-auth-signin');
+    const tabSignUp = document.getElementById('tab-auth-signup');
+    const nameField = document.getElementById('auth-field-name');
+    const submitText = document.getElementById('btn-submit-text');
+    const errorMsg = document.getElementById('auth-error-msg');
+
+    const openModal = (toStep = 1) => {
+      modal.classList.remove('hidden');
+      if (toStep === 2) {
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.remove('hidden');
+        this.selectOnboardingCard(this.currentStyle);
+      } else {
+        if (step1) step1.classList.remove('hidden');
+        if (step2) step2.classList.add('hidden');
+      }
+      if (errorMsg) errorMsg.classList.add('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    };
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+    };
+
+    // Header & Mobile Auth triggers
+    const headerAuthBtn = document.getElementById('btn-header-auth');
+    const mobileAuthBtn = document.getElementById('btn-mobile-auth');
+    if (headerAuthBtn) headerAuthBtn.addEventListener('click', () => openModal(1));
+    if (mobileAuthBtn) mobileAuthBtn.addEventListener('click', () => openModal(1));
+
+    // Close triggers
+    const closeBtn = document.getElementById('btn-close-auth');
+    const backdrop = document.getElementById('auth-modal-backdrop');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    // Auth tabs
+    if (tabSignIn && tabSignUp) {
+      tabSignIn.addEventListener('click', () => {
+        tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
+        tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
+        if (nameField) nameField.classList.add('hidden');
+        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Style';
+        if (errorMsg) errorMsg.classList.add('hidden');
+      });
+
+      tabSignUp.addEventListener('click', () => {
+        tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
+        tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
+        if (nameField) nameField.classList.remove('hidden');
+        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Style';
+        if (errorMsg) errorMsg.classList.add('hidden');
+      });
+    }
+
+    // 1-Click Demo Users
+    const demo1 = document.getElementById('btn-demo-user-1');
+    const demo2 = document.getElementById('btn-demo-user-2');
+    const emailInput = document.getElementById('auth-input-email');
+    const passInput = document.getElementById('auth-input-password');
+    const nameInput = document.getElementById('auth-input-name');
+
+    if (demo1) {
+      demo1.addEventListener('click', () => {
+        if (emailInput) emailInput.value = 'thuha.media@gmail.com';
+        if (passInput) passInput.value = 'thuha123';
+        if (nameInput) nameInput.value = 'Trần Thu Hà';
+        this.pendingAuthUser = {
+          name: 'Trần Thu Hà',
+          email: 'thuha.media@gmail.com',
+          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
+          plan: 'Pro',
+          style: 'office'
+        };
+        this.selectOnboardingCard('office');
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
+
+    if (demo2) {
+      demo2.addEventListener('click', () => {
+        if (emailInput) emailInput.value = 'linh.nk2006@student.edu.vn';
+        if (passInput) passInput.value = 'linh123';
+        if (nameInput) nameInput.value = 'Nguyễn Khánh Linh';
+        this.pendingAuthUser = {
+          name: 'Nguyễn Khánh Linh',
+          email: 'linh.nk2006@student.edu.vn',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+          plan: 'Free',
+          style: 'streetwear'
+        };
+        this.selectOnboardingCard('streetwear');
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
+
+    // Step 1 Form Submit
+    const authForm = document.getElementById('auth-main-form');
+    if (authForm) {
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput ? emailInput.value.trim() : '';
+        const pass = passInput ? passInput.value.trim() : '';
+        let name = nameInput ? nameInput.value.trim() : '';
+        if (!name) {
+          name = email ? email.split('@')[0] : 'ChicSort Member';
+        }
+
+        if (!email || !pass) {
+          if (errorMsg) {
+            errorMsg.textContent = this.lang === 'vi' ? 'Vui lòng nhập đầy đủ email và mật khẩu.' : 'Please enter email and password.';
+            errorMsg.classList.remove('hidden');
+          }
+          return;
+        }
+
+        this.pendingAuthUser = {
+          name: name,
+          email: email,
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+          plan: 'Free',
+          style: this.selectedOnboardingStyle || 'office'
+        };
+
+        this.selectOnboardingCard(this.pendingAuthUser.style);
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
+
+    // Step 2 Style Selection Cards
+    document.querySelectorAll('#onboarding-styles-grid .style-select-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const styleId = card.getAttribute('data-style-id');
+        this.selectOnboardingCard(styleId);
+      });
+    });
+
+    // Step 2 Back to Step 1
+    const btnBack = document.getElementById('btn-back-to-step1');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        if (step2) step2.classList.add('hidden');
+        if (step1) step1.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      });
+    }
+
+    // Step 2 Complete Onboarding
+    const btnComplete = document.getElementById('btn-complete-onboarding');
+    if (btnComplete) {
+      btnComplete.addEventListener('click', () => {
+        if (!this.pendingAuthUser) {
+          this.pendingAuthUser = {
+            name: 'ChicSort Member',
+            email: 'user@chicsort.com',
+            avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
+            plan: 'Free',
+            style: this.selectedOnboardingStyle || 'office'
+          };
+        }
+        this.pendingAuthUser.style = this.selectedOnboardingStyle || 'office';
+        this.currentUser = Object.assign({}, this.pendingAuthUser);
+        this.currentStyle = this.selectedOnboardingStyle || 'office';
+        localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
+
+        closeModal();
+        this.updateUserAuthUI();
+        this.generateOutfits(true);
+
+        const styleName = this.getStyleDisplayName(this.currentStyle);
+        this.showToast(this.lang === 'vi' 
+          ? `Chào mừng ${this.currentUser.name}! Đã thiết lập phong cách: ${styleName}.`
+          : `Welcome ${this.currentUser.name}! Style archetype set to: ${styleName}.`
+        );
+      });
+    }
+
+    // Header Profile Menu Toggle
+    const userMenuBtn = document.getElementById('btn-user-menu-trigger');
+    const userDropdown = document.getElementById('user-profile-dropdown');
+    if (userMenuBtn && userDropdown) {
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!userDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+          userDropdown.classList.add('hidden');
+        }
+      });
+    }
+
+    // Change Style from Profile
+    const btnChangeStyleProfile = document.getElementById('btn-change-style-profile');
+    const btnMobileChangeStyle = document.getElementById('btn-mobile-change-style');
+    const handleChangeStyle = () => {
+      if (userDropdown) userDropdown.classList.add('hidden');
+      this.pendingAuthUser = this.currentUser ? Object.assign({}, this.currentUser) : null;
+      openModal(2);
+    };
+    if (btnChangeStyleProfile) btnChangeStyleProfile.addEventListener('click', handleChangeStyle);
+    if (btnMobileChangeStyle) btnMobileChangeStyle.addEventListener('click', handleChangeStyle);
+
+    // Logout
+    const btnLogout = document.getElementById('btn-user-logout');
+    const btnMobileLogout = document.getElementById('btn-mobile-logout');
+    const handleLogout = () => {
+      this.currentUser = null;
+      localStorage.removeItem('chicsort_user');
+      this.currentStyle = 'office';
+      if (userDropdown) userDropdown.classList.add('hidden');
+      this.updateUserAuthUI();
+      this.generateOutfits(true);
+      this.showToast(this.lang === 'vi' ? 'Đã đăng xuất tài khoản.' : 'Signed out successfully.');
+    };
+    if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+    if (btnMobileLogout) btnMobileLogout.addEventListener('click', handleLogout);
+
+    // AI Stylist Style Archetype Pills
+    document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const style = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
+        this.currentStyle = style;
+        if (this.currentUser) {
+          this.currentUser.style = style;
+          localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
+        }
+        this.updateUserAuthUI();
+        this.generateOutfits(true);
+        const styleName = this.getStyleDisplayName(style);
+        this.showToast(this.lang === 'vi' ? `Đã chuyển sang phong cách: ${styleName}` : `Switched to style: ${styleName}`);
+      });
+    });
   }
 }
 

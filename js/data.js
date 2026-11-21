@@ -303,157 +303,180 @@ const ChicSortData = {
     }
   ],
 
-  // Outfits catalog combinations generator
-  getOutfits: function(weather, occasion) {
+  // Outfits catalog combinations generator (Multi-style + Weather + Occasion)
+  getOutfits: function(weather, occasion, style = 'office') {
     const isVi = ChicSortData.lang === 'vi';
     
-    // Default sets customized based on weather & occasion
-    if (occasion === 'work' || occasion === 'meeting') {
-      return [
-        {
-          id: 'outfit_1',
-          name: isVi ? 'Phong cách Quý cô Công sở Tinh tế (Power Smart Casual)' : 'Power Smart Casual Duo',
-          score: '98%',
-          harmony: isVi ? 'Hài hòa tông ấm Camel + Trắng sáng + Đen tuyền' : 'Warm Camel + Crisp White + Deep Charcoal Harmony',
-          description: isVi 
-            ? 'Kết hợp Blazer Wool dạ màu Camel cùng Sơ mi trắng và Quần âu xếp ly xám. Đôi loafer khóa vàng tạo vẻ quyền lực, chuyên nghiệp tuyệt đối khi gặp đối tác.' 
-            : 'Combines the Camel Wool Blazer with the Crisp White Shirt and Pleated Gray Trousers. Loafers with gold hardware seal an impeccable professional impression.',
-          topId: 'item_3',
-          bottomId: 'item_7',
-          outerwearId: 'item_2',
-          shoesId: 'item_11',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Chỉn chu • Chuyên nghiệp' : 'Professional • Polished'
-        },
-        {
-          id: 'outfit_2',
-          name: isVi ? 'Thanh lịch Hiện đại & Tối giản (Monochrome Minimal)' : 'Monochrome Tailored Look',
-          score: '95%',
-          harmony: isVi ? 'Độ tương phản cao Áo đen gân + Chân váy midi xếp ly' : 'High-contrast Onyx Black with Tailored Accents',
-          description: isVi 
-            ? 'Phối Áo len tăm đen cùng Chân váy midi xếp ly chữ A. Khoác nhẹ Blazer màu be để tạo chiều sâu lớp lang thanh lịch cho cả ngày dài làm việc tại văn phòng.' 
-            : 'Pairing the Essential Ribbed Black Top with the Pleated Midi Skirt, layered gracefully under the Camel Blazer for full-day office confidence.',
-          topId: 'item_6',
-          bottomId: 'item_9',
-          outerwearId: 'item_2',
-          shoesId: 'item_11',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Tối giản • Sang trọng' : 'Minimal • Sophisticated'
-        },
-        {
-          id: 'outfit_3',
-          name: isVi ? 'Trẻ trung Năng động Nơi Công sở (Contemporary Office)' : 'Contemporary Workday Ease',
-          score: '92%',
-          harmony: isVi ? 'Xanh Denim sơ mi + Quần âu xám xếp ly + Sneaker trắng' : 'Chambray Blue meets Tailored Gray and Clean White',
-          description: isVi 
-            ? 'Sơ mi Chambray xanh nhạt cắm thùng vạt cùng Quần âu xám và Sneaker trắng. Vừa giữ được sự lịch sự cần có, vừa thoải mái di chuyển giữa các phòng ban.' 
-            : 'Tuck the Chambray Blue Shirt into Pleated Trousers with Clean White Sneakers. Balances professional dignity with energetic agility.',
-          topId: 'item_4',
-          bottomId: 'item_7',
-          outerwearId: 'item_1',
-          shoesId: 'item_10',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Thoải mái • Trẻ trung' : 'Casual Elegance'
-        }
-      ];
+    // Style configurations for tailored hero recommendation (Outfit 1)
+    const styleOutfits = {
+      office: {
+        name: isVi ? 'Quý cô Công sở Tinh tế (Power Smart Casual)' : 'Power Smart Casual Duo',
+        harmony: isVi ? 'Tông ấm Camel + Trắng sáng + Đen tuyền' : 'Warm Camel + Crisp White + Deep Charcoal Harmony',
+        description: isVi 
+          ? 'Sơ mi trắng Poplin phối Quần âu xám xếp ly và khoác Blazer Camel. Đi kèm Loafer khóa vàng cho diện mạo chuyên nghiệp, uy quyền khi gặp gỡ đối tác.' 
+          : 'Combines the Camel Wool Blazer with Crisp White Shirt and Pleated Gray Trousers. Loafers with gold hardware seal an impeccable professional impression.',
+        topId: 'item_3',
+        bottomId: 'item_7',
+        outerwearId: 'item_2',
+        shoesId: 'item_11',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Office Chic' : 'Personal Match · Office Chic'
+      },
+      minimal: {
+        name: isVi ? 'Tối giản Hiện đại & Suông phom (Clean Minimal Monochrome)' : 'Clean Minimal Monochrome',
+        harmony: isVi ? 'Đen tuyền Onyx + Xám than + Trắng tinh' : 'Onyx Black + Slate Charcoal + Crisp White',
+        description: isVi 
+          ? 'Áo thun len tăm đen sơ vin cùng Quần âu xếp ly xám và Sneaker trắng tối giản. Đường nét tinh giản tuyệt đối giúp bạn toát lên khí chất thanh lịch, hiện đại.' 
+          : 'Essential Ribbed Black Top paired with Pleated Gray Trousers and Clean White Sneakers. Minimalist silhouette radiating effortless, quiet confidence.',
+        topId: 'item_6',
+        bottomId: 'item_7',
+        outerwearId: null,
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Clean Minimal' : 'Personal Match · Clean Minimal'
+      },
+      streetwear: {
+        name: isVi ? 'Phố thị Phóng khoáng (Urban Street Denim Layer)' : 'Urban Street Denim Layer',
+        harmony: isVi ? 'Denim Indigo + Áo đen tăm + Jean ống suông' : 'Indigo Denim + Ribbed Black + Straight Leg',
+        description: isVi 
+          ? 'Áo khoác Denim phom rộng khoác ngoài Áo len tăm đen, phối cùng Quần jean vintage và Sneaker trắng. Năng động, tự do, đậm chất Gen Z đô thị.' 
+          : 'Denim jacket over black crewneck and vintage straight jeans. Balances street toughness with freedom of movement for everyday urban vibes.',
+        topId: 'item_6',
+        bottomId: 'item_8',
+        outerwearId: 'item_1',
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Streetwear' : 'Personal Match · Streetwear'
+      },
+      soft: {
+        name: isVi ? 'Dịu dàng Nữ tính & Bay bổng (Soft Elegance Silhouette)' : 'Soft Elegance Silhouette',
+        harmony: isVi ? 'Màu Kem dệt kim + Chân váy midi xếp ly + Phụ kiện lụa' : 'Cream Knit + Pleated Midi + Silk Accent',
+        description: isVi 
+          ? 'Cardigan dệt kim mềm màu kem phối cùng Chân váy midi xếp ly đen và Túi xách navy thắt nơ lụa. Diện mạo ngọt ngào, dịu dàng và đầy tinh tế.' 
+          : 'Cream Knit Cardigan draped over the Pleated Midi Skirt with Navy Silk Scarf Bag. Creates a soft, approachable, poetic fashion lookbook mood.',
+        topId: 'item_5',
+        bottomId: 'item_9',
+        outerwearId: null,
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Soft Elegance' : 'Personal Match · Soft Elegance'
+      },
+      athleisure: {
+        name: isVi ? 'Thể thao Năng động Thường nhật (Active Comfort Athleisure)' : 'Active Comfort Athleisure',
+        harmony: isVi ? 'Áo tăm co giãn + Quần jean suông + Sneaker thể thao' : 'Stretch Base + Vintage Denim + Clean Sneakers',
+        description: isVi 
+          ? 'Sự kết hợp giữa Áo len tăm co giãn thoải mái, Quần jean ống đứng và Giày sneaker trắng. Vừa khỏe khoắn, hiện đại vừa thuận tiện di chuyển cả ngày.' 
+          : 'Flexible ribbed base tucked into vintage straight jeans with white sneakers. Balances all-day athletic comfort with smart daily aesthetics.',
+        topId: 'item_6',
+        bottomId: 'item_8',
+        outerwearId: 'item_1',
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Athleisure' : 'Personal Match · Athleisure'
+      },
+      vintage: {
+        name: isVi ? 'Cổ điển Hoài niệm & Ấm áp (Retro Vintage Heritage)' : 'Retro Vintage Heritage',
+        harmony: isVi ? 'Blazer wool Camel + Sơ mi Chambray + Loafer cổ điển' : 'Camel Wool + Chambray Blue + Classic Loafer',
+        description: isVi 
+          ? 'Áo Blazer Wool dạ màu Camel kết hợp Sơ mi Chambray xanh nhạt, Quần âu xếp ly và Giày loafer bóng bẩy. Mang hơi thở cổ điển châu Âu ấm áp và có gu.' 
+          : 'Camel Wool Blazer paired with Chambray Shirt, Pleated Trousers, and Gold-Hardware Loafers. Radiates timeless European heritage warmth.',
+        topId: 'item_4',
+        bottomId: 'item_7',
+        outerwearId: 'item_2',
+        shoesId: 'item_11',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Gu cá nhân · Retro Vintage' : 'Personal Match · Retro Vintage'
+      }
+    };
+
+    const chosenHero = styleOutfits[style] || styleOutfits.office;
+
+    // Build Outfit 1 (Personal Style Match 99%)
+    const outfit1 = {
+      id: 'outfit_1',
+      name: chosenHero.name,
+      score: '99%',
+      isPersonalMatch: true,
+      harmony: chosenHero.harmony,
+      description: chosenHero.description,
+      topId: chosenHero.topId,
+      bottomId: chosenHero.bottomId,
+      outerwearId: (weather === 'cold' || weather === 'rainy') ? (chosenHero.outerwearId || 'item_2') : chosenHero.outerwearId,
+      shoesId: chosenHero.shoesId,
+      accessoryId: chosenHero.accessoryId,
+      vibeTag: chosenHero.vibeTag
+    };
+
+    // Build Outfit 2 (Occasion & Weather Focus 95%)
+    let outfit2;
+    if (occasion === 'work') {
+      outfit2 = {
+        id: 'outfit_2',
+        name: isVi ? 'Thanh lịch Nơi Công sở (Contemporary Workday Ease)' : 'Contemporary Workday Ease',
+        score: '95%',
+        harmony: isVi ? 'Sơ mi Chambray xanh nhạt + Quần âu xám + Loafer' : 'Chambray Blue meets Tailored Gray',
+        description: isVi 
+          ? 'Sơ mi Chambray mềm thoáng phối Quần âu xếp ly xám và Giày loafer khóa vàng. Vừa giữ trọn chuẩn mực văn phòng, vừa nhẹ nhàng và thoải mái.' 
+          : 'Chambray Blue Shirt tucked into Pleated Trousers with Polished Loafers. Impeccable professional dignity with effortless comfort.',
+        topId: 'item_4',
+        bottomId: 'item_7',
+        outerwearId: (weather === 'cold') ? 'item_2' : null,
+        shoesId: 'item_11',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Thanh lịch · Chỉn chu' : 'Office Refined'
+      };
     } else if (occasion === 'campus') {
-      return [
-        {
-          id: 'outfit_4',
-          name: isVi ? 'Năng động Giảng đường (Effortless Campus Denim)' : 'Effortless Campus Denim',
-          score: '97%',
-          harmony: isVi ? 'Denim Indigo + Áo thun đen gân + Quần jean vintage' : 'Denim on Denim with Clean Neutral Accents',
-          description: isVi 
-            ? 'Set đồ Denim-on-Denim trẻ trung với Áo khoác denim oversize, Áo thun đen ôm và Quần jean ống suông. Rất thoải mái cho lịch học từ sáng đến chiều.' 
-            : 'Youthful Double Denim styling featuring the Classic Denim Jacket over the Ribbed Black Top and Straight Jeans. Perfect for long university lecture days.',
-          topId: 'item_6',
-          bottomId: 'item_8',
-          outerwearId: 'item_1',
-          shoesId: 'item_10',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Năng động • Gen Z' : 'Campus Chic • Youthful'
-        },
-        {
-          id: 'outfit_5',
-          name: isVi ? 'Phong cách Sinh viên Hàn Quốc (Soft Korean Vibe)' : 'Soft Knit Campus Silhouette',
-          score: '94%',
-          harmony: isVi ? 'Màu Kem dệt kim + Chân váy midi xếp ly đen' : 'Cream Knit with Soft Black Pleats',
-          description: isVi 
-            ? 'Cardigan dệt kim màu kem mềm mại phối cùng Chân váy midi xếp ly đen và Giày sneaker trắng. Diện mạo ngọt ngào, tinh tế khi lên giảng đường hoặc đi thư viện.' 
-            : 'The Cream Knit Cardigan paired with the Pleated Midi Skirt and Clean White Sneakers creates a warm, approachable, editorial academic aesthetic.',
-          topId: 'item_5',
-          bottomId: 'item_9',
-          outerwearId: null,
-          shoesId: 'item_10',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Nhẹ nhàng • Nữ tính' : 'Soft Casual • Trendy'
-        },
-        {
-          id: 'outfit_6',
-          name: isVi ? 'Tối giản & Đột phá (Clean Preppy Student)' : 'Clean Preppy Student Look',
-          score: '91%',
-          harmony: isVi ? 'Sơ mi trắng poplin + Quần jean ống đứng + Loafer khóa vàng' : 'Crisp White Shirt + Classic Denim + Polished Loafers',
-          description: isVi 
-            ? 'Sơ mi trắng Poplin phom rộng buông lơi phối cùng Quần jean vintage và Loafer đen. Đơn giản nhưng tạo ấn tượng có gu thời trang rất rõ nét.' 
-            : 'Oversized Poplin White Shirt casually tucked into Vintage Straight Jeans, grounded with Gold Bit Loafers for an elevated collegiate feel.',
-          topId: 'item_3',
-          bottomId: 'item_8',
-          outerwearId: 'item_1',
-          shoesId: 'item_11',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Cá tính • Có gu' : 'Preppy • Smart'
-        }
-      ];
+      outfit2 = {
+        id: 'outfit_2',
+        name: isVi ? 'Hơi thở Giảng đường Trẻ trung (Collegiate Denim Smart)' : 'Collegiate Denim Smart',
+        score: '95%',
+        harmony: isVi ? 'Sơ mi trắng + Jean ống đứng + Sneaker' : 'Crisp Poplin with Vintage Denim',
+        description: isVi 
+          ? 'Sơ mi trắng Poplin phom rộng buông vạt nhẹ cùng Quần jean vintage và Sneaker trắng. Đơn giản nhưng tạo ấn tượng có gu thời trang rất rõ nét.' 
+          : 'Oversized Poplin White Shirt casually tucked into Vintage Straight Jeans, grounded with White Sneakers for a sharp academic aesthetic.',
+        topId: 'item_3',
+        bottomId: 'item_8',
+        outerwearId: (weather === 'cold') ? 'item_1' : null,
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Học đường · Năng động' : 'Collegiate Chic'
+      };
     } else {
-      // Weekend / Cafe / Social
-      return [
-        {
-          id: 'outfit_7',
-          name: isVi ? 'Dạo phố & Cà phê Cuối tuần (Weekend City Stroll)' : 'Weekend City Stroll',
-          score: '99%',
-          harmony: isVi ? 'Cardigan kem + Quần jean vintage + Sneaker trắng' : 'Cream & Vintage Blue Palette',
-          description: isVi 
-            ? 'Sự phối hợp ngọt ngào giữa Cardigan dệt kim màu kem và Quần jean ống đứng vintage. Túi xách navy quàng vai tạo điểm nhấn hoàn hảo cho buổi chụp ảnh sống ảo.' 
-            : 'Comfortable luxury featuring the Cream Cardigan and Straight Jeans. The Navy Shoulder Bag anchors the outfit with an unmistakable pop of color.',
-          topId: 'item_5',
-          bottomId: 'item_8',
-          outerwearId: null,
-          shoesId: 'item_10',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Thư giãn • Sống ảo' : 'Relaxed • Photogenic'
-        },
-        {
-          id: 'outfit_8',
-          name: isVi ? 'Hiện đại & Cá tính (Urban Cool Street)' : 'Urban Cool Contrast',
-          score: '95%',
-          harmony: isVi ? 'Áo khoác denim + Chân váy xếp ly + Áo thun đen' : 'Edgy Denim over Pleated Silhouette',
-          description: isVi 
-            ? 'Áo khoác Denim ngoài kết hợp Áo thun đen và Chân váy chữ A midi. Đi cùng Sneaker trắng tạo nét tương phản giữa cá tính đường phố và sự nữ tính.' 
-            : 'Denim jacket over black crewneck and pleated skirt. Balances street toughness with feminine flow for spontaneous weekend meetups.',
-          topId: 'item_6',
-          bottomId: 'item_9',
-          outerwearId: 'item_1',
-          shoesId: 'item_10',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Cá tính • Hiện đại' : 'Street Chic • Bold'
-        },
-        {
-          id: 'outfit_9',
-          name: isVi ? 'Hẹn hò Lãng mạn Tinh tế (Chic Date Night)' : 'Refined Evening Date',
-          score: '93%',
-          harmony: isVi ? 'Blazer be khoác hờ + Áo đen tăm + Loafer sang trọng' : 'Camel Blazer draped over Sleek Black Base',
-          description: isVi 
-            ? 'Áo thun ôm đen sơ vin cùng Quần âu xám, khoác hờ chiếc Blazer be qua vai. Đi kèm Loafer đen bóng và Túi xách da navy sang chảnh cho buổi tối lãng mạn.' 
-            : 'Black Ribbed Top with Pleated Trousers and the Camel Blazer effortlessly draped over shoulders, paired with Polished Loafers for a memorable dinner.',
-          topId: 'item_6',
-          bottomId: 'item_7',
-          outerwearId: 'item_2',
-          shoesId: 'item_11',
-          accessoryId: 'item_12',
-          vibeTag: isVi ? 'Quyến rũ • Tinh tế' : 'Alluring • Elegant'
-        }
-      ];
+      outfit2 = {
+        id: 'outfit_2',
+        name: isVi ? 'Dạo phố & Cà phê Cuối tuần (Weekend City Stroll)' : 'Weekend City Stroll',
+        score: '95%',
+        harmony: isVi ? 'Cardigan kem + Jean ống đứng + Sneaker trắng' : 'Cream & Vintage Blue Palette',
+        description: isVi 
+          ? 'Cardigan dệt kim màu kem mềm mại cùng Quần jean ống đứng. Túi xách navy quàng vai tạo điểm nhấn hoàn hảo cho buổi chụp ảnh sống ảo cuối tuần.' 
+          : 'Comfortable luxury featuring the Cream Cardigan and Straight Jeans. The Navy Shoulder Bag anchors the outfit with a pop of color.',
+        topId: 'item_5',
+        bottomId: 'item_8',
+        outerwearId: null,
+        shoesId: 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Thư giãn · Sống ảo' : 'Relaxed Stroll'
+      };
     }
+
+    // Build Outfit 3 (Versatile Contrast 92%)
+    const outfit3 = {
+      id: 'outfit_3',
+      name: isVi ? 'Tương phản Đa phong cách (Dynamic Contrast Duo)' : 'Dynamic Contrast Duo',
+      score: '92%',
+      harmony: isVi ? 'Áo đen gân + Chân váy xếp ly + Áo khoác phối' : 'Onyx Black meets Pleated Midi Silhouette',
+      description: isVi 
+        ? 'Áo thun ôm đen gân cắm thùng cùng Chân váy chữ A midi xếp ly. Đi cùng Sneaker hoặc Loafer tạo nét tương phản hài hòa giữa cá tính và nét dịu dàng.' 
+        : 'Essential Black Top tucked into the Pleated Midi Skirt. Balances structured silhouette with gentle movement for spontaneous plans.',
+      topId: 'item_6',
+      bottomId: 'item_9',
+      outerwearId: (weather === 'cold' || weather === 'cool') ? 'item_2' : null,
+      shoesId: (occasion === 'work') ? 'item_11' : 'item_10',
+      accessoryId: 'item_12',
+      vibeTag: isVi ? 'Linh hoạt · Thời thượng' : 'Versatile Contrast'
+    };
+
+    return [outfit1, outfit2, outfit3];
   },
 
   // Bilingual Dictionary (100% Comprehensive Coverage)
@@ -668,6 +691,39 @@ const ChicSortData = {
       btnFillAdminDemo: '1-Click Demo Fill',
       adminAuthError: 'Invalid administrator credentials. Please try again.',
 
+      // Auth & Style Onboarding
+      btnSignIn: 'Sign In',
+      btnSignUp: 'Sign Up',
+      authBadge: 'User Authentication',
+      authTitle: 'SIGN IN OR CREATE ACCOUNT',
+      tabSignIn: 'Sign In',
+      tabSignUp: 'Create Account',
+      quickDemoLabel: 'Quick Demo Access (1-Click)',
+      authNameLabel: 'Full Name',
+      authEmailLabel: 'Email Address',
+      authPassLabel: 'Password',
+      btnContinueToStyle: 'Next: Choose Daily Style',
+      onboardingStepLabel: 'Step 2 / 2 · AI Personalization',
+      onboardingTitle: 'WHAT IS YOUR DAILY STYLE?',
+      onboardingSub: 'AI Stylist will prioritize outfits tailored specifically to this aesthetic each morning.',
+      btnCompleteStyle: 'Finish & Launch AI Wardrobe',
+      styleLabel: 'Personal Style Archetype',
+      matchedStyleNote: 'Personalized to match your daily aesthetic',
+      styleOfficeTitle: 'Office Chic',
+      styleOfficeDesc: 'Polished, sharp, and professional',
+      styleMinimalTitle: 'Clean Minimal',
+      styleMinimalDesc: 'Monochrome and clean silhouettes',
+      styleStreetwearTitle: 'Youthful Streetwear',
+      styleStreetwearDesc: 'Energetic, expressive, and relaxed',
+      styleSoftTitle: 'Soft Elegance',
+      styleSoftDesc: 'Gentle, feminine, and graceful',
+      styleAthleisureTitle: 'Athleisure',
+      styleAthleisureDesc: 'Sporty, functional, and effortless',
+      styleVintageTitle: 'Retro Vintage',
+      styleVintageDesc: 'Warm, textured, and nostalgic',
+      menuChangeStyle: 'Change Daily Style',
+      menuLogout: 'Sign Out',
+
       // Footer
       footerTagline: 'Wardrobe-First Styling Intelligence',
       footerAdminLink: 'Admin Portal'
@@ -881,6 +937,39 @@ const ChicSortData = {
       btnAdminSignIn: 'Đăng nhập hệ thống',
       btnFillAdminDemo: 'Bấm để điền nhanh Demo',
       adminAuthError: 'Email hoặc mật khẩu không chính xác.',
+
+      // Auth & Style Onboarding
+      btnSignIn: 'Đăng nhập',
+      btnSignUp: 'Đăng ký',
+      authBadge: 'Xác thực người dùng',
+      authTitle: 'ĐĂNG NHẬP HOẶC TẠO TÀI KHOẢN',
+      tabSignIn: 'Đăng nhập',
+      tabSignUp: 'Đăng ký mới',
+      quickDemoLabel: 'Tài khoản mẫu dùng thử (1-Chạm)',
+      authNameLabel: 'Họ và tên',
+      authEmailLabel: 'Email của bạn',
+      authPassLabel: 'Mật khẩu',
+      btnContinueToStyle: 'Tiếp tục chọn phong cách',
+      onboardingStepLabel: 'Bước 2 / 2 · Cá nhân hóa AI',
+      onboardingTitle: 'CHỌN PHONG CÁCH HÀNG NGÀY',
+      onboardingSub: 'AI Stylist sẽ ưu tiên phối các bộ đồ bám sát gu thẩm mỹ này của bạn mỗi sáng.',
+      btnCompleteStyle: 'Hoàn tất & Khám phá Tủ đồ AI',
+      styleLabel: 'Phong cách phối đồ',
+      matchedStyleNote: 'Đang đồng bộ với Gu hàng ngày của bạn',
+      styleOfficeTitle: 'Công sở Thanh lịch',
+      styleOfficeDesc: 'Chỉn chu, sắc sảo, chuẩn mực',
+      styleMinimalTitle: 'Tối giản Hiện đại',
+      styleMinimalDesc: 'Đơn sắc, tinh giản chi tiết',
+      styleStreetwearTitle: 'Trẻ trung Phố thị',
+      styleStreetwearDesc: 'Năng động, cá tính, tự do',
+      styleSoftTitle: 'Dịu dàng Tinh tế',
+      styleSoftDesc: 'Mềm mại, nữ tính, bay bổng',
+      styleAthleisureTitle: 'Thể thao Thường nhật',
+      styleAthleisureDesc: 'Tiện dụng, khỏe khoắn',
+      styleVintageTitle: 'Cổ điển Hoài niệm',
+      styleVintageDesc: 'Ấm áp, có chiều sâu thị giác',
+      menuChangeStyle: 'Đổi phong cách hàng ngày',
+      menuLogout: 'Đăng xuất',
 
       // Footer
       footerTagline: 'Thời trang thông minh · Tủ đồ số cá nhân',

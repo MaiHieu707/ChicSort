@@ -1315,6 +1315,92 @@ html.dark .editorial-toast {
   box-shadow: 0 24px 64px rgba(38, 43, 64, 0.25);
 }
 
+/* User Profile Header & Dropdown */
+.user-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid var(--border-hairline);
+  padding: 4px 12px 4px 5px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-profile-btn:hover {
+  border-color: var(--cobalt);
+  box-shadow: 0 4px 12px rgba(4, 116, 196, 0.12);
+}
+
+html.dark .user-profile-btn {
+  background: var(--paper-card);
+  border-color: var(--border-hairline);
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 270px;
+  background: white;
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 16px 40px rgba(38, 43, 64, 0.14);
+  z-index: 60;
+  animation: dropdownIn 0.2s var(--ease-out-expo);
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+html.dark .user-dropdown-menu {
+  background: #161C2B !important;
+  border-color: var(--border-hairline) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* Style Select Cards (Onboarding Step 2) */
+.style-select-card {
+  background: white;
+  border: 1px solid var(--border-hairline);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.style-select-card:hover {
+  border-color: var(--color-steel);
+  background: rgba(168, 196, 236, 0.08);
+  transform: translateY(-2px);
+}
+
+.style-select-card.active {
+  border-color: var(--cobalt);
+  background: rgba(4, 116, 196, 0.08);
+  box-shadow: 0 0 0 1.5px var(--cobalt);
+}
+
+html.dark .style-select-card {
+  background: #111522;
+  border-color: var(--border-hairline);
+}
+
+html.dark .style-select-card:hover {
+  background: rgba(168, 196, 236, 0.12);
+}
+
+html.dark .style-select-card.active {
+  border-color: var(--cobalt);
+  background: rgba(4, 116, 196, 0.22);
+}
+
 /* ============================================================
    REDUCED MOTION
    ============================================================ */
