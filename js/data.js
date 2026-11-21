@@ -303,6 +303,42 @@ const ChicSortData = {
     }
   ],
 
+  // Pre-configured accounts for instant sign in (hidden from UI)
+  presetAccounts: {
+    'maihieu@chicsort.com': {
+      name: 'Mai Hiếu',
+      password: 'chicsort2026',
+      altPassword: '123456',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      plan: 'Pro VIP',
+      styles: ['office', 'streetwear', 'minimal']
+    },
+    'hieu@chicsort.com': {
+      name: 'Mai Hiếu',
+      password: '123456',
+      altPassword: 'chicsort2026',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      plan: 'Pro VIP',
+      styles: ['office', 'streetwear', 'minimal']
+    },
+    'demo@chicsort.com': {
+      name: 'Trần Thu Hà',
+      password: '123456',
+      altPassword: 'chicsort2026',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
+      plan: 'Pro Member',
+      styles: ['office', 'minimal']
+    },
+    'user@chicsort.com': {
+      name: 'Khánh Linh',
+      password: '123456',
+      altPassword: 'chicsort2026',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80',
+      plan: 'Free Member',
+      styles: ['streetwear', 'athleisure']
+    }
+  },
+
   // Outfits catalog combinations generator (Multi-style + Weather + Occasion)
   getOutfits: function(weather, occasion, styles = ['office']) {
     const isVi = ChicSortData.lang === 'vi';

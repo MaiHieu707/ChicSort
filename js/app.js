@@ -1119,14 +1119,16 @@ class ChicSortApp {
     // Auth tabs
     if (tabSignIn && tabSignUp) {
       tabSignIn.addEventListener('click', () => {
+        this.pendingAuthMode = 'signin';
         tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
         tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
         if (nameField) nameField.classList.add('hidden');
-        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Styles';
+        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Đăng nhập' : 'Sign In';
         if (errorMsg) errorMsg.classList.add('hidden');
       });
 
       tabSignUp.addEventListener('click', () => {
+        this.pendingAuthMode = 'signup';
         tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
         tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
         if (nameField) nameField.classList.remove('hidden');
@@ -1140,12 +1142,9 @@ class ChicSortApp {
     if (authForm) {
       authForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = emailInput ? emailInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
         const pass = passInput ? passInput.value.trim() : '';
         let name = nameInput ? nameInput.value.trim() : '';
-        if (!name) {
-          name = email ? email.split('@')[0] : 'ChicSort Member';
-        }
 
         if (!email || !pass) {
           if (errorMsg) {
@@ -1155,15 +1154,54 @@ class ChicSortApp {
           return;
         }
 
+        const presets = this.data.presetAccounts || {};
+        const savedAccounts = JSON.parse(localStorage.getItem('chicsort_registered_users') || '{}');
+        const matchedAccount = presets[email] || savedAccounts[email];
+
+        // If on Sign In tab and account exists with styles pre-configured: instant direct login!
+        if (this.pendingAuthMode === 'signin' && matchedAccount) {
+          this.currentUser = {
+            name: matchedAccount.name,
+            email: email,
+            avatar: matchedAccount.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+            plan: matchedAccount.plan || 'Pro VIP',
+            styles: [...(matchedAccount.styles || ['office'])]
+          };
+          this.currentStyles = [...this.currentUser.styles];
+          this.currentStyle = this.currentStyles[0] || 'office';
+          this.selectedOnboardingStyles = [...this.currentStyles];
+          localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
+
+          closeModal();
+          this.updateUserAuthUI();
+          this.generateOutfits(true);
+
+          const styleNames = this.currentStyles.map(s => this.getStyleDisplayName(s)).join(', ');
+          this.showToast(this.lang === 'vi' 
+            ? `Chào mừng ${this.currentUser.name} trở lại! Đã đồng bộ ${this.currentStyles.length} gu: ${styleNames}.`
+            : `Welcome back ${this.currentUser.name}! Synced ${this.currentStyles.length} styles: ${styleNames}.`
+          );
+          return;
+        }
+
+        // Proceed to Step 2 for new users or Sign Up tab
+        if (!name) {
+          name = matchedAccount ? matchedAccount.name : (email ? email.split('@')[0] : 'ChicSort Member');
+        }
+
+        const preSelected = (matchedAccount && matchedAccount.styles) 
+          ? matchedAccount.styles 
+          : (this.selectedOnboardingStyles.length ? this.selectedOnboardingStyles : ['office']);
+
         this.pendingAuthUser = {
           name: name,
           email: email,
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
-          plan: 'Free',
-          styles: [...this.selectedOnboardingStyles]
+          avatar: matchedAccount?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+          plan: matchedAccount?.plan || 'Free',
+          styles: [...preSelected]
         };
 
-        this.selectedOnboardingStyles = this.selectedOnboardingStyles.length ? this.selectedOnboardingStyles : ['office'];
+        this.selectedOnboardingStyles = [...preSelected];
         this.renderOnboardingCards();
         if (step1) step1.classList.add('hidden');
         if (step2) step2.classList.remove('hidden');
@@ -1207,6 +1245,16 @@ class ChicSortApp {
         this.currentStyles = [...this.selectedOnboardingStyles];
         this.currentStyle = this.currentStyles[0] || 'office';
         localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
+
+        // Save to registered accounts dictionary for persistent sign in
+        const savedAccounts = JSON.parse(localStorage.getItem('chicsort_registered_users') || '{}');
+        savedAccounts[this.currentUser.email.toLowerCase()] = {
+          name: this.currentUser.name,
+          avatar: this.currentUser.avatar,
+          plan: this.currentUser.plan,
+          styles: [...this.currentStyles]
+        };
+        localStorage.setItem('chicsort_registered_users', JSON.stringify(savedAccounts));
 
         closeModal();
         this.updateUserAuthUI();
