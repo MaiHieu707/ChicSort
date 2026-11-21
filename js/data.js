@@ -221,7 +221,7 @@ const ChicSortData = {
       id: 'USR-212',
       name: 'Trần Thu Hà',
       email: 'thuha.tran@comms.vn',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://images.unsplash.com/photo-1660472142578-791ef9537451?auto=format&fit=crop&w=200&h=200&crop=focalpoint&fp-x=0.33&fp-y=0.45&fp-z=1.8&q=80',
       persona: 'Office / Comms Lead (25yo)',
       persona_vi: 'Chuyên viên Truyền thông (25t)',
       plan: 'Premium Pro',
@@ -235,7 +235,7 @@ const ChicSortData = {
       id: 'USR-211',
       name: 'Nguyễn Khánh Linh',
       email: 'linh.nk2006@student.edu.vn',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://images.unsplash.com/photo-1672039316344-e311981f22b6?auto=format&fit=crop&w=200&h=200&crop=focalpoint&fp-y=0.3&fp-z=1.6&q=80',
       persona: 'University Student (20yo)',
       persona_vi: 'Sinh viên năm 2 (20t)',
       plan: 'Freemium',
@@ -325,7 +325,7 @@ const ChicSortData = {
       name: 'Trần Thu Hà',
       password: '123456',
       altPassword: 'chicsort2026',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
+      avatar: 'https://images.unsplash.com/photo-1660472142578-791ef9537451?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-x=0.33&fp-y=0.45&fp-z=1.8&q=80',
       plan: 'Pro Member',
       styles: ['office', 'minimal']
     },
@@ -333,7 +333,7 @@ const ChicSortData = {
       name: 'Khánh Linh',
       password: '123456',
       altPassword: 'chicsort2026',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80',
+      avatar: 'https://images.unsplash.com/photo-1672039316344-e311981f22b6?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-y=0.3&fp-z=1.6&q=80',
       plan: 'Free Member',
       styles: ['streetwear', 'athleisure']
     }

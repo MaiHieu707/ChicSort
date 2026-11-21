@@ -1009,7 +1009,7 @@ class ChicSortApp {
       const dropEmail = document.getElementById('dropdown-user-email');
       const dropStylesContainer = document.getElementById('dropdown-user-styles-container');
 
-      const avatarUrl = this.currentUser.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80';
+      const avatarUrl = this.currentUser.avatar || 'https://images.unsplash.com/photo-1660472142578-791ef9537451?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-x=0.33&fp-y=0.45&fp-z=1.8&q=80';
       if (avatarEl) avatarEl.src = avatarUrl;
       if (nameEl) {
         const parts = (this.currentUser.name || '').trim().split(' ');
@@ -1163,7 +1163,7 @@ class ChicSortApp {
           this.currentUser = {
             name: matchedAccount.name,
             email: email,
-            avatar: matchedAccount.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+            avatar: matchedAccount.avatar || 'https://images.unsplash.com/photo-1672039316344-e311981f22b6?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-y=0.3&fp-z=1.6&q=80',
             plan: matchedAccount.plan || 'Pro VIP',
             styles: [...(matchedAccount.styles || ['office'])]
           };
@@ -1196,7 +1196,7 @@ class ChicSortApp {
         this.pendingAuthUser = {
           name: name,
           email: email,
-          avatar: matchedAccount?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+          avatar: matchedAccount?.avatar || 'https://images.unsplash.com/photo-1672039316344-e311981f22b6?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-y=0.3&fp-z=1.6&q=80',
           plan: matchedAccount?.plan || 'Free',
           styles: [...preSelected]
         };
@@ -1235,7 +1235,7 @@ class ChicSortApp {
           this.pendingAuthUser = {
             name: 'ChicSort Member',
             email: 'user@chicsort.com',
-            avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
+            avatar: 'https://images.unsplash.com/photo-1660472142578-791ef9537451?auto=format&fit=crop&w=120&h=120&crop=focalpoint&fp-x=0.33&fp-y=0.45&fp-z=1.8&q=80',
             plan: 'Free',
             styles: [...this.selectedOnboardingStyles]
           };
