@@ -304,8 +304,14 @@ const ChicSortData = {
   ],
 
   // Outfits catalog combinations generator (Multi-style + Weather + Occasion)
-  getOutfits: function(weather, occasion, style = 'office') {
+  getOutfits: function(weather, occasion, styles = ['office']) {
     const isVi = ChicSortData.lang === 'vi';
+    
+    // Normalize styles parameter to array
+    const styleList = Array.isArray(styles) ? (styles.length ? styles : ['office']) : [styles];
+    const primaryStyle = styleList[0] || 'office';
+    const secondaryStyle = styleList.length > 1 ? styleList[1] : null;
+    const tertiaryStyle = styleList.length > 2 ? styleList[2] : null;
     
     // Style configurations for tailored hero recommendation (Outfit 1)
     const styleOutfits = {
@@ -389,9 +395,9 @@ const ChicSortData = {
       }
     };
 
-    const chosenHero = styleOutfits[style] || styleOutfits.office;
+    const chosenHero = styleOutfits[primaryStyle] || styleOutfits.office;
 
-    // Build Outfit 1 (Personal Style Match 99%)
+    // Build Outfit 1 (Primary Personal Style Match 99%)
     const outfit1 = {
       id: 'outfit_1',
       name: chosenHero.name,
@@ -404,12 +410,30 @@ const ChicSortData = {
       outerwearId: (weather === 'cold' || weather === 'rainy') ? (chosenHero.outerwearId || 'item_2') : chosenHero.outerwearId,
       shoesId: chosenHero.shoesId,
       accessoryId: chosenHero.accessoryId,
-      vibeTag: chosenHero.vibeTag
+      vibeTag: styleList.length > 1
+        ? (isVi ? `Gu #1 · ${chosenHero.vibeTag.replace(/^Gu cá nhân · /, '')}` : `Match #1 · ${chosenHero.vibeTag.replace(/^Personal Match · /, '')}`)
+        : chosenHero.vibeTag
     };
 
-    // Build Outfit 2 (Occasion & Weather Focus 95%)
+    // Build Outfit 2: Tailor to secondary style if present (97%), else weather/occasion (95%)
     let outfit2;
-    if (occasion === 'work') {
+    if (secondaryStyle && styleOutfits[secondaryStyle]) {
+      const secHero = styleOutfits[secondaryStyle];
+      outfit2 = {
+        id: 'outfit_2',
+        name: secHero.name,
+        score: '97%',
+        isPersonalMatch: true,
+        harmony: secHero.harmony,
+        description: secHero.description,
+        topId: secHero.topId,
+        bottomId: secHero.bottomId,
+        outerwearId: (weather === 'cold' || weather === 'rainy') ? (secHero.outerwearId || 'item_2') : secHero.outerwearId,
+        shoesId: secHero.shoesId,
+        accessoryId: secHero.accessoryId,
+        vibeTag: isVi ? `Gu #2 · ${secHero.vibeTag.replace(/^Gu cá nhân · /, '')}` : `Match #2 · ${secHero.vibeTag.replace(/^Personal Match · /, '')}`
+      };
+    } else if (occasion === 'work') {
       outfit2 = {
         id: 'outfit_2',
         name: isVi ? 'Thanh lịch Nơi Công sở (Contemporary Workday Ease)' : 'Contemporary Workday Ease',
@@ -459,22 +483,41 @@ const ChicSortData = {
       };
     }
 
-    // Build Outfit 3 (Versatile Contrast 92%)
-    const outfit3 = {
-      id: 'outfit_3',
-      name: isVi ? 'Tương phản Đa phong cách (Dynamic Contrast Duo)' : 'Dynamic Contrast Duo',
-      score: '92%',
-      harmony: isVi ? 'Áo đen gân + Chân váy xếp ly + Áo khoác phối' : 'Onyx Black meets Pleated Midi Silhouette',
-      description: isVi 
-        ? 'Áo thun ôm đen gân cắm thùng cùng Chân váy chữ A midi xếp ly. Đi cùng Sneaker hoặc Loafer tạo nét tương phản hài hòa giữa cá tính và nét dịu dàng.' 
-        : 'Essential Black Top tucked into the Pleated Midi Skirt. Balances structured silhouette with gentle movement for spontaneous plans.',
-      topId: 'item_6',
-      bottomId: 'item_9',
-      outerwearId: (weather === 'cold' || weather === 'cool') ? 'item_2' : null,
-      shoesId: (occasion === 'work') ? 'item_11' : 'item_10',
-      accessoryId: 'item_12',
-      vibeTag: isVi ? 'Linh hoạt · Thời thượng' : 'Versatile Contrast'
-    };
+    // Build Outfit 3: Tailor to tertiary style if present (94%), else versatile contrast (92%)
+    let outfit3;
+    if (tertiaryStyle && styleOutfits[tertiaryStyle]) {
+      const tertHero = styleOutfits[tertiaryStyle];
+      outfit3 = {
+        id: 'outfit_3',
+        name: tertHero.name,
+        score: '94%',
+        isPersonalMatch: true,
+        harmony: tertHero.harmony,
+        description: tertHero.description,
+        topId: tertHero.topId,
+        bottomId: tertHero.bottomId,
+        outerwearId: (weather === 'cold' || weather === 'rainy') ? (tertHero.outerwearId || 'item_2') : tertHero.outerwearId,
+        shoesId: tertHero.shoesId,
+        accessoryId: tertHero.accessoryId,
+        vibeTag: isVi ? `Gu #3 · ${tertHero.vibeTag.replace(/^Gu cá nhân · /, '')}` : `Match #3 · ${tertHero.vibeTag.replace(/^Personal Match · /, '')}`
+      };
+    } else {
+      outfit3 = {
+        id: 'outfit_3',
+        name: isVi ? 'Tương phản Đa phong cách (Dynamic Contrast Duo)' : 'Dynamic Contrast Duo',
+        score: '92%',
+        harmony: isVi ? 'Áo đen gân + Chân váy xếp ly + Áo khoác phối' : 'Onyx Black meets Pleated Midi Silhouette',
+        description: isVi 
+          ? 'Áo thun ôm đen gân cắm thùng cùng Chân váy chữ A midi xếp ly. Đi cùng Sneaker hoặc Loafer tạo nét tương phản hài hòa giữa cá tính và nét dịu dàng.' 
+          : 'Essential Black Top tucked into the Pleated Midi Skirt. Balances structured silhouette with gentle movement for spontaneous plans.',
+        topId: 'item_6',
+        bottomId: 'item_9',
+        outerwearId: (weather === 'cold' || weather === 'cool') ? 'item_2' : null,
+        shoesId: (occasion === 'work') ? 'item_11' : 'item_10',
+        accessoryId: 'item_12',
+        vibeTag: isVi ? 'Linh hoạt · Thời thượng' : 'Versatile Contrast'
+      };
+    }
 
     return [outfit1, outfit2, outfit3];
   },
@@ -704,8 +747,8 @@ const ChicSortData = {
       authPassLabel: 'Password',
       btnContinueToStyle: 'Next: Choose Daily Style',
       onboardingStepLabel: 'Step 2 / 2 · AI Personalization',
-      onboardingTitle: 'WHAT IS YOUR DAILY STYLE?',
-      onboardingSub: 'AI Stylist will prioritize outfits tailored specifically to this aesthetic each morning.',
+      onboardingTitle: 'CHOOSE YOUR DAILY STYLES (MULTI-SELECT)',
+      onboardingSub: 'Select 1 or more aesthetic archetypes. AI Stylist will blend and prioritize outfits matching these preferences every morning.',
       btnCompleteStyle: 'Finish & Launch AI Wardrobe',
       styleLabel: 'Personal Style Archetype',
       matchedStyleNote: 'Personalized to match your daily aesthetic',
@@ -951,8 +994,8 @@ const ChicSortData = {
       authPassLabel: 'Mật khẩu',
       btnContinueToStyle: 'Tiếp tục chọn phong cách',
       onboardingStepLabel: 'Bước 2 / 2 · Cá nhân hóa AI',
-      onboardingTitle: 'CHỌN PHONG CÁCH HÀNG NGÀY',
-      onboardingSub: 'AI Stylist sẽ ưu tiên phối các bộ đồ bám sát gu thẩm mỹ này của bạn mỗi sáng.',
+      onboardingTitle: 'CHỌN CÁC PHONG CÁCH HÀNG NGÀY (CHỌN NHIỀU)',
+      onboardingSub: 'Chọn 1 hoặc nhiều phong cách yêu thích. AI Stylist sẽ kết hợp và ưu tiên các gợi ý outfit bám sát các gu này mỗi sáng.',
       btnCompleteStyle: 'Hoàn tất & Khám phá Tủ đồ AI',
       styleLabel: 'Phong cách phối đồ',
       matchedStyleNote: 'Đang đồng bộ với Gu hàng ngày của bạn',

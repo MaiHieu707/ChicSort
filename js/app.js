@@ -44,9 +44,18 @@ class ChicSortApp {
     // User profile and style archetype state
     const savedUser = localStorage.getItem('chicsort_user');
     this.currentUser = savedUser ? JSON.parse(savedUser) : null;
-    this.currentStyle = (this.currentUser && this.currentUser.style) || 'office';
+    
+    // Support multi-styles array
+    if (this.currentUser && Array.isArray(this.currentUser.styles) && this.currentUser.styles.length > 0) {
+      this.currentStyles = [...this.currentUser.styles];
+    } else if (this.currentUser && this.currentUser.style) {
+      this.currentStyles = [this.currentUser.style];
+    } else {
+      this.currentStyles = ['office'];
+    }
+    this.currentStyle = this.currentStyles[0] || 'office';
     this.pendingAuthUser = null;
-    this.selectedOnboardingStyle = this.currentStyle;
+    this.selectedOnboardingStyles = [...this.currentStyles];
 
     // Theme state
     this.theme = localStorage.getItem('chicsort_theme') || 'light';
@@ -692,14 +701,14 @@ class ChicSortApp {
     }
 
     setTimeout(() => {
-      this.currentOutfits = this.data.getOutfits(this.currentWeather, this.currentOccasion, this.currentStyle);
+      this.currentOutfits = this.data.getOutfits(this.currentWeather, this.currentOccasion, this.currentStyles);
       const isVi = this.lang === 'vi';
       const d = this.data.dict[this.lang];
 
-      // Sync active state on stylist style pills
+      // Sync active state on stylist style pills (multi-active support)
       document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
         const s = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
-        if (s === this.currentStyle) {
+        if (this.currentStyles.includes(s)) {
           btn.classList.add('active');
         } else {
           btn.classList.remove('active');
@@ -709,15 +718,15 @@ class ChicSortApp {
       // Update matched style note in console header
       const noteEl = document.getElementById('user-matched-style-note');
       if (noteEl) {
-        const styleName = this.getStyleDisplayName(this.currentStyle);
+        const names = this.currentStyles.map(s => this.getStyleDisplayName(s)).join(', ');
         if (this.currentUser) {
           noteEl.textContent = isVi 
-            ? `Đang ưu tiên gợi ý theo gu: ${styleName}`
-            : `Prioritizing looks for your aesthetic: ${styleName}`;
+            ? `Đang phối hợp ${this.currentStyles.length} gu: ${names}`
+            : `Blending ${this.currentStyles.length} styles: ${names}`;
         } else {
           noteEl.textContent = isVi
-            ? `Gợi ý số 1 đang ưu tiên theo gu: ${styleName}`
-            : `Look #1 tailored for archetype: ${styleName}`;
+            ? `Đang xem theo ${this.currentStyles.length} gu: ${names}`
+            : `Viewing ${this.currentStyles.length} styles: ${names}`;
         }
       }
 
@@ -925,12 +934,39 @@ class ChicSortApp {
     return dict[styleId] || styleId;
   }
 
-  selectOnboardingCard(styleId) {
-    this.selectedOnboardingStyle = styleId;
+  getShortStyleDisplayName(styleId) {
+    const isVi = this.lang === 'vi';
+    const dict = {
+      office: isVi ? '👔 Công sở' : '👔 Office',
+      minimal: isVi ? '🌿 Tối giản' : '🌿 Minimal',
+      streetwear: isVi ? '🛹 Phố thị' : '🛹 Street',
+      soft: isVi ? '🌸 Dịu dàng' : '🌸 Soft',
+      athleisure: isVi ? '👟 Thể thao' : '👟 Sport',
+      vintage: isVi ? '📻 Cổ điển' : '📻 Vintage'
+    };
+    return dict[styleId] || styleId;
+  }
+
+  toggleOnboardingCard(styleId) {
+    const idx = this.selectedOnboardingStyles.indexOf(styleId);
+    if (idx > -1) {
+      if (this.selectedOnboardingStyles.length > 1) {
+        this.selectedOnboardingStyles.splice(idx, 1);
+      } else {
+        this.showToast(this.lang === 'vi' ? 'Bạn cần giữ ít nhất 1 phong cách yêu thích!' : 'Please keep at least 1 preferred style!');
+        return;
+      }
+    } else {
+      this.selectedOnboardingStyles.push(styleId);
+    }
+    this.renderOnboardingCards();
+  }
+
+  renderOnboardingCards() {
     document.querySelectorAll('#onboarding-styles-grid .style-select-card').forEach(card => {
       const s = card.getAttribute('data-style-id');
       const checkMark = card.querySelector('.style-check-mark');
-      if (s === styleId) {
+      if (this.selectedOnboardingStyles.includes(s)) {
         card.classList.add('active');
         if (checkMark) checkMark.classList.remove('hidden');
       } else {
@@ -938,6 +974,11 @@ class ChicSortApp {
         if (checkMark) checkMark.classList.add('hidden');
       }
     });
+
+    const countEl = document.getElementById('onboarding-selected-count');
+    if (countEl) {
+      countEl.textContent = this.selectedOnboardingStyles.length;
+    }
   }
 
   updateUserAuthUI() {
@@ -947,7 +988,15 @@ class ChicSortApp {
     const mobileLoggedOut = document.getElementById('mobile-auth-logged-out');
     const mobileLoggedIn = document.getElementById('mobile-auth-logged-in');
 
-    const styleName = this.getStyleDisplayName(this.currentStyle);
+    // Build badge text for header
+    let badgeText = '';
+    if (this.currentStyles.length === 1) {
+      badgeText = this.getStyleDisplayName(this.currentStyles[0]);
+    } else if (this.currentStyles.length === 2) {
+      badgeText = `${this.getShortStyleDisplayName(this.currentStyles[0])} + ${this.getShortStyleDisplayName(this.currentStyles[1])}`;
+    } else {
+      badgeText = isVi ? `${this.currentStyles.length} Gu phong cách` : `${this.currentStyles.length} Styles`;
+    }
 
     if (this.currentUser) {
       if (headerAuthBtn) headerAuthBtn.classList.add('hidden');
@@ -958,7 +1007,7 @@ class ChicSortApp {
       const badgeEl = document.getElementById('header-user-style-badge');
       const dropName = document.getElementById('dropdown-user-name');
       const dropEmail = document.getElementById('dropdown-user-email');
-      const dropStyle = document.getElementById('dropdown-user-style');
+      const dropStylesContainer = document.getElementById('dropdown-user-styles-container');
 
       const avatarUrl = this.currentUser.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80';
       if (avatarEl) avatarEl.src = avatarUrl;
@@ -966,10 +1015,15 @@ class ChicSortApp {
         const parts = (this.currentUser.name || '').trim().split(' ');
         nameEl.textContent = parts[parts.length - 1] || this.currentUser.name;
       }
-      if (badgeEl) badgeEl.textContent = styleName;
+      if (badgeEl) badgeEl.textContent = badgeText;
       if (dropName) dropName.textContent = this.currentUser.name;
       if (dropEmail) dropEmail.textContent = this.currentUser.email;
-      if (dropStyle) dropStyle.textContent = `Gu: ${styleName}`;
+
+      if (dropStylesContainer) {
+        dropStylesContainer.innerHTML = this.currentStyles.map(s => `
+          <span class="fashion-badge text-xs py-0.5 px-2.5">${this.getShortStyleDisplayName(s)}</span>
+        `).join('');
+      }
 
       // Mobile drawer
       if (mobileLoggedOut) mobileLoggedOut.classList.add('hidden');
@@ -979,7 +1033,7 @@ class ChicSortApp {
       const mobStyle = document.getElementById('mobile-user-style');
       if (mobAvatar) mobAvatar.src = avatarUrl;
       if (mobName) mobName.textContent = this.currentUser.name;
-      if (mobStyle) mobStyle.textContent = `${styleName} (${this.currentUser.plan || 'Free'})`;
+      if (mobStyle) mobStyle.textContent = `${badgeText} (${this.currentUser.plan || 'Free'})`;
     } else {
       if (headerAuthBtn) headerAuthBtn.classList.remove('hidden');
       if (headerUserProfile) headerUserProfile.classList.add('hidden');
@@ -994,7 +1048,7 @@ class ChicSortApp {
     // Update style pills in AI Stylist console
     document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
       const s = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
-      if (s === this.currentStyle) {
+      if (this.currentStyles.includes(s)) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -1003,14 +1057,15 @@ class ChicSortApp {
 
     const noteEl = document.getElementById('user-matched-style-note');
     if (noteEl) {
+      const names = this.currentStyles.map(s => this.getStyleDisplayName(s)).join(', ');
       if (this.currentUser) {
         noteEl.textContent = isVi 
-          ? `Đang ưu tiên gợi ý theo gu: ${styleName}`
-          : `Prioritizing looks for your aesthetic: ${styleName}`;
+          ? `Đang phối hợp ${this.currentStyles.length} gu: ${names}`
+          : `Blending ${this.currentStyles.length} styles: ${names}`;
       } else {
         noteEl.textContent = isVi
-          ? `Gợi ý số 1 đang ưu tiên theo gu: ${styleName}`
-          : `Look #1 tailored for archetype: ${styleName}`;
+          ? `Đang xem theo ${this.currentStyles.length} gu: ${names}`
+          : `Viewing ${this.currentStyles.length} styles: ${names}`;
       }
     }
   }
@@ -1026,13 +1081,17 @@ class ChicSortApp {
     const nameField = document.getElementById('auth-field-name');
     const submitText = document.getElementById('btn-submit-text');
     const errorMsg = document.getElementById('auth-error-msg');
+    const emailInput = document.getElementById('auth-input-email');
+    const passInput = document.getElementById('auth-input-password');
+    const nameInput = document.getElementById('auth-input-name');
 
     const openModal = (toStep = 1) => {
       modal.classList.remove('hidden');
       if (toStep === 2) {
         if (step1) step1.classList.add('hidden');
         if (step2) step2.classList.remove('hidden');
-        this.selectOnboardingCard(this.currentStyle);
+        this.selectedOnboardingStyles = [...this.currentStyles];
+        this.renderOnboardingCards();
       } else {
         if (step1) step1.classList.remove('hidden');
         if (step2) step2.classList.add('hidden');
@@ -1063,7 +1122,7 @@ class ChicSortApp {
         tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
         tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
         if (nameField) nameField.classList.add('hidden');
-        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Style';
+        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Styles';
         if (errorMsg) errorMsg.classList.add('hidden');
       });
 
@@ -1071,53 +1130,8 @@ class ChicSortApp {
         tabSignUp.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-cobalt text-cobalt transition';
         tabSignIn.className = 'flex-1 pb-3 text-sm font-bold border-b-2 border-transparent text-ink-muted hover:text-ink transition';
         if (nameField) nameField.classList.remove('hidden');
-        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Style';
+        if (submitText) submitText.textContent = this.lang === 'vi' ? 'Tiếp tục chọn phong cách' : 'Next: Choose Daily Styles';
         if (errorMsg) errorMsg.classList.add('hidden');
-      });
-    }
-
-    // 1-Click Demo Users
-    const demo1 = document.getElementById('btn-demo-user-1');
-    const demo2 = document.getElementById('btn-demo-user-2');
-    const emailInput = document.getElementById('auth-input-email');
-    const passInput = document.getElementById('auth-input-password');
-    const nameInput = document.getElementById('auth-input-name');
-
-    if (demo1) {
-      demo1.addEventListener('click', () => {
-        if (emailInput) emailInput.value = 'thuha.media@gmail.com';
-        if (passInput) passInput.value = 'thuha123';
-        if (nameInput) nameInput.value = 'Trần Thu Hà';
-        this.pendingAuthUser = {
-          name: 'Trần Thu Hà',
-          email: 'thuha.media@gmail.com',
-          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
-          plan: 'Pro',
-          style: 'office'
-        };
-        this.selectOnboardingCard('office');
-        if (step1) step1.classList.add('hidden');
-        if (step2) step2.classList.remove('hidden');
-        if (window.lucide) window.lucide.createIcons();
-      });
-    }
-
-    if (demo2) {
-      demo2.addEventListener('click', () => {
-        if (emailInput) emailInput.value = 'linh.nk2006@student.edu.vn';
-        if (passInput) passInput.value = 'linh123';
-        if (nameInput) nameInput.value = 'Nguyễn Khánh Linh';
-        this.pendingAuthUser = {
-          name: 'Nguyễn Khánh Linh',
-          email: 'linh.nk2006@student.edu.vn',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
-          plan: 'Free',
-          style: 'streetwear'
-        };
-        this.selectOnboardingCard('streetwear');
-        if (step1) step1.classList.add('hidden');
-        if (step2) step2.classList.remove('hidden');
-        if (window.lucide) window.lucide.createIcons();
       });
     }
 
@@ -1146,21 +1160,22 @@ class ChicSortApp {
           email: email,
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
           plan: 'Free',
-          style: this.selectedOnboardingStyle || 'office'
+          styles: [...this.selectedOnboardingStyles]
         };
 
-        this.selectOnboardingCard(this.pendingAuthUser.style);
+        this.selectedOnboardingStyles = this.selectedOnboardingStyles.length ? this.selectedOnboardingStyles : ['office'];
+        this.renderOnboardingCards();
         if (step1) step1.classList.add('hidden');
         if (step2) step2.classList.remove('hidden');
         if (window.lucide) window.lucide.createIcons();
       });
     }
 
-    // Step 2 Style Selection Cards
+    // Step 2 Style Selection Cards (Multi-Select toggle)
     document.querySelectorAll('#onboarding-styles-grid .style-select-card').forEach(card => {
       card.addEventListener('click', () => {
         const styleId = card.getAttribute('data-style-id');
-        this.selectOnboardingCard(styleId);
+        this.toggleOnboardingCard(styleId);
       });
     });
 
@@ -1184,22 +1199,23 @@ class ChicSortApp {
             email: 'user@chicsort.com',
             avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
             plan: 'Free',
-            style: this.selectedOnboardingStyle || 'office'
+            styles: [...this.selectedOnboardingStyles]
           };
         }
-        this.pendingAuthUser.style = this.selectedOnboardingStyle || 'office';
+        this.pendingAuthUser.styles = [...this.selectedOnboardingStyles];
         this.currentUser = Object.assign({}, this.pendingAuthUser);
-        this.currentStyle = this.selectedOnboardingStyle || 'office';
+        this.currentStyles = [...this.selectedOnboardingStyles];
+        this.currentStyle = this.currentStyles[0] || 'office';
         localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
 
         closeModal();
         this.updateUserAuthUI();
         this.generateOutfits(true);
 
-        const styleName = this.getStyleDisplayName(this.currentStyle);
+        const styleNames = this.currentStyles.map(s => this.getStyleDisplayName(s)).join(', ');
         this.showToast(this.lang === 'vi' 
-          ? `Chào mừng ${this.currentUser.name}! Đã thiết lập phong cách: ${styleName}.`
-          : `Welcome ${this.currentUser.name}! Style archetype set to: ${styleName}.`
+          ? `Chào mừng ${this.currentUser.name}! Đã thiết lập ${this.currentStyles.length} phong cách: ${styleNames}.`
+          : `Welcome ${this.currentUser.name}! Set ${this.currentStyles.length} styles: ${styleNames}.`
         );
       });
     }
@@ -1237,7 +1253,9 @@ class ChicSortApp {
     const handleLogout = () => {
       this.currentUser = null;
       localStorage.removeItem('chicsort_user');
+      this.currentStyles = ['office'];
       this.currentStyle = 'office';
+      this.selectedOnboardingStyles = ['office'];
       if (userDropdown) userDropdown.classList.add('hidden');
       this.updateUserAuthUI();
       this.generateOutfits(true);
@@ -1246,19 +1264,30 @@ class ChicSortApp {
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
     if (btnMobileLogout) btnMobileLogout.addEventListener('click', handleLogout);
 
-    // AI Stylist Style Archetype Pills
+    // AI Stylist Style Archetype Pills (Toggle multi-selection on click)
     document.querySelectorAll('#stylist-style-pills [data-style-pill], #stylist-style-pills [data-style-choice]').forEach(btn => {
       btn.addEventListener('click', () => {
         const style = btn.getAttribute('data-style-pill') || btn.getAttribute('data-style-choice');
-        this.currentStyle = style;
+        const idx = this.currentStyles.indexOf(style);
+        if (idx > -1) {
+          if (this.currentStyles.length > 1) {
+            this.currentStyles.splice(idx, 1);
+          } else {
+            this.showToast(this.lang === 'vi' ? 'Cần giữ ít nhất 1 phong cách hoạt động!' : 'Keep at least 1 active style!');
+            return;
+          }
+        } else {
+          this.currentStyles.push(style);
+        }
+        this.currentStyle = this.currentStyles[0] || 'office';
         if (this.currentUser) {
-          this.currentUser.style = style;
+          this.currentUser.styles = [...this.currentStyles];
           localStorage.setItem('chicsort_user', JSON.stringify(this.currentUser));
         }
         this.updateUserAuthUI();
         this.generateOutfits(true);
-        const styleName = this.getStyleDisplayName(style);
-        this.showToast(this.lang === 'vi' ? `Đã chuyển sang phong cách: ${styleName}` : `Switched to style: ${styleName}`);
+        const styleNames = this.currentStyles.map(s => this.getStyleDisplayName(s)).join(', ');
+        this.showToast(this.lang === 'vi' ? `Đang phối hợp ${this.currentStyles.length} gu: ${styleNames}` : `Active styles (${this.currentStyles.length}): ${styleNames}`);
       });
     });
   }

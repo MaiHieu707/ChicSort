@@ -129,7 +129,7 @@
               <div class="pb-3 border-b border-slate-100 dark:border-white/10 mb-3">
                 <p id="dropdown-user-name" class="font-bold text-ink text-sm">Trần Thu Hà</p>
                 <p id="dropdown-user-email" class="text-xs text-ink-muted">thuha.media@gmail.com</p>
-                <div class="mt-2.5">
+                <div class="mt-2.5 flex flex-wrap gap-1.5" id="dropdown-user-styles-container">
                   <span id="dropdown-user-style" class="fashion-badge text-xs py-1 px-3">👔 Office Chic</span>
                 </div>
               </div>
@@ -1307,30 +1307,6 @@
           </button>
         </div>
 
-        <!-- 1-Click Demo Quick Accounts -->
-        <div class="p-4 rounded-2xl bg-paper dark:bg-white/5 border border-slate-200 dark:border-white/10 mb-6 space-y-2.5">
-          <span class="text-xs font-bold text-cobalt uppercase tracking-wide block flex items-center gap-1.5">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-            <span data-i18n="quickDemoLabel">Tài khoản mẫu dùng thử (1-Chạm)</span>
-          </span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button type="button" id="btn-demo-user-1" class="p-3 text-left bg-white dark:bg-[#161C2B] border border-slate-200 dark:border-white/10 hover:border-cobalt rounded-xl transition shadow-xs flex items-center gap-2.5">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" class="w-8 h-8 rounded-full object-cover shrink-0" alt="" />
-              <div>
-                <p class="font-bold text-xs text-ink leading-tight">Trần Thu Hà</p>
-                <p class="text-[11px] text-ink-muted leading-tight">Công sở · Pro</p>
-              </div>
-            </button>
-            <button type="button" id="btn-demo-user-2" class="p-3 text-left bg-white dark:bg-[#161C2B] border border-slate-200 dark:border-white/10 hover:border-cobalt rounded-xl transition shadow-xs flex items-center gap-2.5">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" class="w-8 h-8 rounded-full object-cover shrink-0" alt="" />
-              <div>
-                <p class="font-bold text-xs text-ink leading-tight">Khánh Linh</p>
-                <p class="text-[11px] text-ink-muted leading-tight">Sinh viên · Free</p>
-              </div>
-            </button>
-          </div>
-        </div>
-
         <!-- Interactive Form -->
         <form id="auth-main-form" class="space-y-4 text-sm">
           <div id="auth-field-name" class="hidden">
@@ -1361,14 +1337,14 @@
           <span class="text-xs font-bold text-cobalt uppercase tracking-wider block mb-1" data-i18n="onboardingStepLabel">Bước 2 / 2 · Cá nhân hóa AI</span>
           <h4 class="font-display font-black text-xl text-ink uppercase" data-i18n="onboardingTitle">Chọn phong cách hàng ngày</h4>
           <p class="text-xs sm:text-sm text-ink-muted mt-1 leading-relaxed" data-i18n="onboardingSub">
-            AI Stylist sẽ ưu tiên phối các bộ đồ bám sát gu thẩm mỹ này của bạn mỗi sáng.
+            Chọn 1 hoặc nhiều phong cách yêu thích. AI Stylist sẽ kết hợp và ưu tiên các gợi ý outfit bám sát các gu này mỗi sáng.
           </p>
         </div>
 
-        <!-- 6 Extended Style Cards Grid -->
+        <!-- 6 Extended Style Cards Grid (Multi-Select) -->
         <div class="grid grid-cols-2 gap-3" id="onboarding-styles-grid">
           <!-- Card 1 -->
-          <div class="style-select-card active p-4 rounded-2xl border text-left transition relative" data-style-id="office">
+          <div class="style-select-card active p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="office">
             <div class="text-2xl mb-1.5">👔</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleOfficeTitle">Công sở Thanh lịch</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleOfficeDesc">Chỉn chu, sắc sảo, chuẩn mực</p>
@@ -1377,7 +1353,7 @@
             </div>
           </div>
           <!-- Card 2 -->
-          <div class="style-select-card p-4 rounded-2xl border text-left transition relative" data-style-id="minimal">
+          <div class="style-select-card p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="minimal">
             <div class="text-2xl mb-1.5">🌿</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleMinimalTitle">Tối giản Hiện đại</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleMinimalDesc">Đơn sắc, tinh giản chi tiết</p>
@@ -1386,7 +1362,7 @@
             </div>
           </div>
           <!-- Card 3 -->
-          <div class="style-select-card p-4 rounded-2xl border text-left transition relative" data-style-id="streetwear">
+          <div class="style-select-card p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="streetwear">
             <div class="text-2xl mb-1.5">🛹</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleStreetwearTitle">Trẻ trung Phố thị</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleStreetwearDesc">Năng động, cá tính, tự do</p>
@@ -1395,7 +1371,7 @@
             </div>
           </div>
           <!-- Card 4 -->
-          <div class="style-select-card p-4 rounded-2xl border text-left transition relative" data-style-id="soft">
+          <div class="style-select-card p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="soft">
             <div class="text-2xl mb-1.5">🌸</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleSoftTitle">Dịu dàng Tinh tế</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleSoftDesc">Mềm mại, nữ tính, bay bổng</p>
@@ -1404,7 +1380,7 @@
             </div>
           </div>
           <!-- Card 5 -->
-          <div class="style-select-card p-4 rounded-2xl border text-left transition relative" data-style-id="athleisure">
+          <div class="style-select-card p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="athleisure">
             <div class="text-2xl mb-1.5">👟</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleAthleisureTitle">Thể thao Thường nhật</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleAthleisureDesc">Tiện dụng, khỏe khoắn</p>
@@ -1413,7 +1389,7 @@
             </div>
           </div>
           <!-- Card 6 -->
-          <div class="style-select-card p-4 rounded-2xl border text-left transition relative" data-style-id="vintage">
+          <div class="style-select-card p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="vintage">
             <div class="text-2xl mb-1.5">📻</div>
             <p class="font-bold text-sm text-ink leading-tight" data-i18n="styleVintageTitle">Cổ điển Hoài niệm</p>
             <p class="text-[11px] text-ink-muted mt-1 leading-tight" data-i18n="styleVintageDesc">Ấm áp, có chiều sâu thị giác</p>
@@ -1421,6 +1397,15 @@
               <i data-lucide="check-circle-2" class="w-4 h-4"></i>
             </div>
           </div>
+        </div>
+
+        <!-- Multi-select indicator -->
+        <div class="flex items-center justify-between text-xs text-ink-muted px-1">
+          <span><span id="onboarding-selected-count" class="font-bold text-cobalt">1</span> phong cách được chọn</span>
+          <span class="text-cobalt font-medium inline-flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Chọn nhiều phong cách</span>
+          </span>
         </div>
 
         <div class="pt-2 flex gap-3">
