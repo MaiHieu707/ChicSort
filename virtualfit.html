@@ -548,6 +548,14 @@
       align-items: center;
       justify-content: center;
       will-change: transform;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .cur {
+        display: none !important;
+      }
     }
 
     .cur-ring {
@@ -997,6 +1005,7 @@
 
     // Global Pointer Coordinates for Cursor & Parallax
     window.addEventListener('pointermove', (e) => {
+      if (cursorEl) cursorEl.style.opacity = '1';
       curTargetX = e.clientX;
       curTargetY = e.clientY;
       rawPointerX = e.clientX / window.innerWidth;

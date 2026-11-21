@@ -831,15 +831,15 @@ class ChicSortApp {
       const monthLabel = isVi ? `Th ${monthNum}` : (monthNamesEn[monthNum - 1] || `M${monthNum}`);
 
       return `
-        <div class="calendar-log-card flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-          <div class="flex items-center gap-5">
+        <div class="calendar-log-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5">
+          <div class="flex items-center gap-4 sm:gap-5 min-w-0 flex-1">
             <div class="calendar-date-badge">
               <span class="badge-month">${monthLabel}</span>
               <span class="badge-day">${dayNum}</span>
             </div>
-            <div>
-              <h4 class="font-display font-bold text-base text-ink mb-1.5 leading-snug">${log.outfitName}</h4>
-              <p class="text-sm text-ink-muted leading-relaxed">${log.items ? log.items.join(' · ') : (isVi ? 'Phối đồ hoàn chỉnh' : 'Full Outfit')}</p>
+            <div class="min-w-0 flex-1">
+              <h4 class="font-display font-bold text-base text-ink mb-1 leading-snug truncate sm:whitespace-normal">${log.outfitName}</h4>
+              <p class="text-xs sm:text-sm text-ink-muted leading-relaxed line-clamp-2">${log.items ? log.items.join(' · ') : (isVi ? 'Phối đồ hoàn chỉnh' : 'Full Outfit')}</p>
             </div>
           </div>
           <span class="soft-pill text-xs font-semibold shrink-0 self-start sm:self-center">${occMap[log.occasion] || log.occasion}</span>

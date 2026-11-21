@@ -78,7 +78,7 @@
         </a>
 
         <!-- Desktop Navigation Tabs: Soft & Elegant -->
-        <nav class="hidden md:flex items-center gap-1" id="desktop-nav">
+        <nav class="hidden xl:flex items-center gap-1" id="desktop-nav">
           <button data-nav-tab="pitch" class="nav-link tab-active">
             <span data-i18n="navPitch">Tổng quan</span>
           </button>
@@ -151,7 +151,7 @@
           </button>
 
           <!-- Mobile Nav Toggle -->
-          <button id="btn-mobile-menu" class="md:hidden p-2 text-ink border border-slate-200 bg-white rounded-lg">
+          <button id="btn-mobile-menu" class="xl:hidden p-2 text-ink border border-slate-200 bg-white rounded-lg">
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
         </div>
@@ -835,22 +835,22 @@
               </span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4" id="stylist-style-pills">
-              <button class="soft-pill active py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="office" data-style-pill="office">
+              <button class="soft-pill active py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="office" data-style-pill="office">
                 <span>👔</span> <span data-i18n="styleOfficeTitle">Công sở</span>
               </button>
-              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="minimal" data-style-pill="minimal">
+              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="minimal" data-style-pill="minimal">
                 <span>🌿</span> <span data-i18n="styleMinimalTitle">Tối giản</span>
               </button>
-              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="streetwear" data-style-pill="streetwear">
+              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="streetwear" data-style-pill="streetwear">
                 <span>🛹</span> <span data-i18n="styleStreetwearTitle">Phố thị</span>
               </button>
-              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="soft" data-style-pill="soft">
+              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="soft" data-style-pill="soft">
                 <span>🌸</span> <span data-i18n="styleSoftTitle">Dịu dàng</span>
               </button>
-              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="athleisure" data-style-pill="athleisure">
+              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="athleisure" data-style-pill="athleisure">
                 <span>👟</span> <span data-i18n="styleAthleisureTitle">Thể thao</span>
               </button>
-              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl" data-style-choice="vintage" data-style-pill="vintage">
+              <button class="soft-pill py-3 px-3 text-xs sm:text-sm font-semibold justify-center rounded-xl whitespace-nowrap inline-flex items-center gap-1.5" data-style-choice="vintage" data-style-pill="vintage">
                 <span>📻</span> <span data-i18n="styleVintageTitle">Cổ điển</span>
               </button>
             </div>
@@ -870,7 +870,7 @@
         </div>
 
         <!-- Outfits Container (3 distinct editorial cards with ample spacing) -->
-        <div id="stylist-outfits-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+        <div id="stylist-outfits-container" class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           <!-- Rendered dynamically via app.js -->
         </div>
 
@@ -1342,8 +1342,8 @@
           </p>
         </div>
 
-        <!-- 6 Extended Style Cards Grid (Multi-Select) -->
-        <div class="grid grid-cols-2 gap-4 sm:gap-4.5" id="onboarding-styles-grid">
+        <!-- 6 Extended Style Cards Grid (Multi-Select with Dedicated Scroll Area) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 max-h-[48vh] overflow-y-auto pr-1" id="onboarding-styles-grid">
           <!-- Card 1 -->
           <div class="style-select-card active p-4 rounded-2xl border text-left transition relative cursor-pointer" data-style-id="office">
             <div class="text-2xl mb-1.5">👔</div>
